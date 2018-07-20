@@ -5,8 +5,35 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Frixel.UI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="300" Width="300">
+        Title="MainWindow" Height="363.636" Width="492.805">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="70*"/>
+            <ColumnDefinition Width="27*"/>
+        </Grid.ColumnDefinitions>
+        <Canvas Background="#FFECECEC"/>
+        <Button Content="Reference Geo" VerticalAlignment="Top" Height="86" Grid.Column="1"/>
+        <Slider Grid.Column="1" Margin="54,100,10,0" VerticalAlignment="Top" RenderTransformOrigin="0.379,0.13"/>
+        <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="10,100,0,0" TextWrapping="Wrap" Text="Grid X" VerticalAlignment="Top" FontStyle="Italic"/>
+        <Slider Grid.Column="1" Margin="54,120,10,0" VerticalAlignment="Top" RenderTransformOrigin="0.379,0.13"/>
+        <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="10,122,0,0" TextWrapping="Wrap" Text="Grid Y" VerticalAlignment="Top" FontStyle="Italic"/>
+
+
+        <GroupBox Header="Results" Margin="5,153,5,5" Grid.Column="1" Background="#FFF9F9F9">
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*"/>
+                    <ColumnDefinition Width="24*"/>
+                    <ColumnDefinition Width="37*"/>
+                    <ColumnDefinition Width="4*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Margin="0,10,0,0" TextWrapping="Wrap" Text="Key" VerticalAlignment="Top" FontSize="9" RenderTransformOrigin="1.062,1.295" Grid.Column="1" Height="12" FontWeight="Bold"/>
+                <TextBlock Grid.Column="2" Margin="5,10,0,0" TextWrapping="Wrap" Text="Value" VerticalAlignment="Top" FontSize="9" RenderTransformOrigin="1.062,1.295" Height="13"/>
+                <TextBlock Margin="0,26,0,0" TextWrapping="Wrap" Text="Key" VerticalAlignment="Top" FontSize="9" RenderTransformOrigin="1.062,1.295" Grid.Column="1" Height="12" FontWeight="Bold"/>
+                <TextBlock Grid.Column="2" Margin="5,26,0,0" TextWrapping="Wrap" Text="Value" VerticalAlignment="Top" FontSize="9" RenderTransformOrigin="1.062,1.295" Height="13"/>
+                <TextBlock Margin="0,42,0,0" TextWrapping="Wrap" Text="Key" VerticalAlignment="Top" FontSize="9" RenderTransformOrigin="1.062,1.295" Grid.Column="1" Height="12" FontWeight="Bold"/>
+                <TextBlock Grid.Column="2" Margin="5,42,0,0" TextWrapping="Wrap" Text="Value" VerticalAlignment="Top" FontSize="9" RenderTransformOrigin="1.062,1.295" Height="14"/>
+            </Grid>
+        </GroupBox>
     </Grid>
 </Window>
