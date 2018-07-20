@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>5f199cfd-b7c4-4c36-b7be-85387c684348</ProjectGuid>
+    <ProjectGuid>{5F199CFD-B7C4-4C36-B7BE-85387C684348}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Frixel.Optimizer</RootNamespace>
@@ -30,24 +30,45 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System"/>
-    
-    <Reference Include="System.Core"/>
-    <Reference Include="System.Xml.Linq"/>
-    <Reference Include="System.Data.DataSetExtensions"/>
-    
-    
-    <Reference Include="Microsoft.CSharp"/>
-    
-    <Reference Include="System.Data"/>
-    
-    <Reference Include="System.Net.Http"/>
-    
-    <Reference Include="System.Xml"/>
+    <Reference Include="GeneticSharp.Domain, Version=1.1.6601.1437, Culture=neutral, PublicKeyToken=d63d2a65268366c6, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeneticSharp.1.2.0\lib\net35\GeneticSharp.Domain.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GeneticSharp.Extensions, Version=1.1.6601.1440, Culture=neutral, PublicKeyToken=f24c5e2578f0ecff, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeneticSharp.1.2.0\lib\net35\GeneticSharp.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GeneticSharp.Infrastructure.Framework, Version=1.1.6601.1437, Culture=neutral, PublicKeyToken=f24c5e2578f0ecff, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeneticSharp.1.2.0\lib\net35\GeneticSharp.Infrastructure.Framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GeneticSharp.Infrastructure.Threading, Version=1.1.6601.1439, Culture=neutral, PublicKeyToken=f24c5e2578f0ecff, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeneticSharp.1.2.0\lib\net35\GeneticSharp.Infrastructure.Threading.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NCalc, Version=1.3.8.0, Culture=neutral, PublicKeyToken=973cde3f1cafed03, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeneticSharp.1.2.0\lib\net35\NCalc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SmartThreadPool, Version=2.2.4.0, Culture=neutral, PublicKeyToken=1126fe8b671e8a79, processorArchitecture=MSIL">
+      <HintPath>..\packages\SmartThreadPool.dll.2.2.4\lib\net45\SmartThreadPool.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
- </Project>
+</Project>

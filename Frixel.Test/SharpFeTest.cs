@@ -3,9 +3,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Frixel.Test {
     [TestClass]
-    public class UnitTest1 {
+    public class SharpFeTest {
         [TestMethod]
-        public void TestMethod1() {
+        public void AnalyzeSimple2DFrame() {
+            
+
+
         }
     }
 }
