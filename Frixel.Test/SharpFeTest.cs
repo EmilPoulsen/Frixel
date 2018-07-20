@@ -6,7 +6,8 @@ namespace Frixel.Test {
     public class SharpFeTest {
         [TestMethod]
         public void AnalyzeSimple2DFrame() {
-            
+
+                       
 
 
         }
