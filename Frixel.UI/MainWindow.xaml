@@ -11,15 +11,15 @@
             <ColumnDefinition Width="70*"/>
             <ColumnDefinition Width="27*"/>
         </Grid.ColumnDefinitions>
-        <Canvas Background="#FFECECEC"/>
-        <Button Content="Reference Geo" VerticalAlignment="Top" Height="86" Grid.Column="1"/>
-        <Slider Grid.Column="1" Margin="54,100,10,0" VerticalAlignment="Top" RenderTransformOrigin="0.379,0.13"/>
+        <Canvas x:Name="canv_Main" Background="#FFECECEC"/>
+        <Button x:Name="btn_RefGeo" Click="btn_RefGeo_Click" Content="Reference Geo" VerticalAlignment="Top" Height="69" Grid.Column="1" Margin="10,10,10,0" Background="#FFFFD7C8"/>
+        <Slider x:Name="sld_GridX" ValueChanged="sld_GridX_ValueChanged" Grid.Column="1" Margin="54,100,10,0" VerticalAlignment="Top" RenderTransformOrigin="0.379,0.13" Maximum="1" LargeChange="0.25" SmallChange="0.05"/>
         <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="10,100,0,0" TextWrapping="Wrap" Text="Grid X" VerticalAlignment="Top" FontStyle="Italic"/>
-        <Slider Grid.Column="1" Margin="54,120,10,0" VerticalAlignment="Top" RenderTransformOrigin="0.379,0.13"/>
+        <Slider x:Name="sld_GridY" ValueChanged="sld_GridY_ValueChanged" Grid.Column="1" Margin="54,120,10,0" VerticalAlignment="Top" RenderTransformOrigin="0.379,0.13" LargeChange="0.25" Maximum="1" SmallChange="0.05"/>
         <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="10,122,0,0" TextWrapping="Wrap" Text="Grid Y" VerticalAlignment="Top" FontStyle="Italic"/>
 
 
-        <GroupBox Header="Results" Margin="5,153,5,5" Grid.Column="1" Background="#FFF9F9F9">
+        <GroupBox x:Name="grp_Results" Header="Results" Margin="5,153,5,95" Grid.Column="1" Background="#FFF9F9F9">
             <Grid Grid.Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
@@ -35,5 +35,19 @@
                 <TextBlock Grid.Column="2" Margin="5,42,0,0" TextWrapping="Wrap" Text="Value" VerticalAlignment="Top" FontSize="9" RenderTransformOrigin="1.062,1.295" Height="14"/>
             </Grid>
         </GroupBox>
+        <Grid Grid.Column="1" Margin="0,243,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5*"/>
+                <RowDefinition Height="13*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="71*"/>
+                <ColumnDefinition Width="64*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="btn_Run" Content="Run" Margin="7,0,1,6" Grid.RowSpan="2" Background="#FFEDFFBD"/>
+            <Button x:Name="btn_Reset" Content="Reset" Margin="1,0,6,1" Grid.Column="1" Background="#FFF1F1F1"/>
+            <Button x:Name="btn_Save" Content="Save" Margin="1,1,6,6" Grid.Column="1" Grid.Row="1" Background="#FFE7EED7"/>
+        </Grid>
+        <TextBlock x:Name="tb_GridSize" TextWrapping="Wrap" Text="gridsize" Margin="5,314,257,3"/>
     </Grid>
 </Window>
