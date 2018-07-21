@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Frixel.Core.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace Frixel.Core.Geometry
     {
         public bool IsLocked;
         public bool IsInside;
+        public bool IsPixeled = false;
         public double X;
         public double Y;
 
@@ -17,6 +19,12 @@ namespace Frixel.Core.Geometry
         {
             this.X = x;
             this.Y = y;
+        }
+
+        public Point2d Map(Domain2d from, Domain2d to)
+        {
+            return new Point2d(this.X.Map(from.X, to.X),
+                            this.Y.Map(from.Y, to.Y));
         }
     }
 }

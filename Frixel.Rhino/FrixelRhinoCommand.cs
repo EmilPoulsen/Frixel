@@ -9,6 +9,7 @@ using Rhino.Input;
 using Rhino.Input.Custom;
 using Frixel.Rhinoceros.Extensions;
 using Frixel.Core;
+using Frixel.Core.Extensions;
 
 namespace Frixel.Rhinoceros
 {
@@ -153,6 +154,10 @@ namespace Frixel.Rhinoceros
                             nodeList.IndexOf(botRightPt),
                             PixelState.None
                             ));
+                        topLeftPt.IsPixeled = true;
+                        topRightPt.IsPixeled = true;
+                        botLeftPt.IsPixeled = true;
+                        botRightPt.IsPixeled = true;
                     }
                 }
             }
@@ -185,27 +190,41 @@ namespace Frixel.Rhinoceros
             bool xDir = Math.Abs(_spine.Item1.X - _spine.Item2.X) > Math.Abs(_spine.Item1.Y - _spine.Item2.Y);
             if (xDir)
             {
-                var horzPts = nodeDictionary.Where(x => x.Key.Item2 == coord.Item2).ToList().Select(x => x.Value);
+                var horzPts = nodeDictionary.Where(x => x.Key.Item2 == coord.Item2).ToList().Select(x => x.Value).ToList();
+                List<Core.Geometry.Point2d> newPts = new List<Core.Geometry.Point2d>();
                 foreach (var pt in horzPts)
                 {
                     var myCoord = nodeList.IndexOf(pt);
                     foreach (var p in pixelList.Where(p => p.ContainsNode(myCoord,true)).ToList())
                     {
                         p.ChangeStateTo(PixelState.Moment);
+                        newPts.Add(nodeList[p.BottomLeft]);
+                        newPts.Add(nodeList[p.TopLeft]);
                     }
                 }
+                horzPts.AddRange(newPts);
+                // Lock support points (LEFT)
+                var horzPtsMin = horzPts.Select(p => p.X).Min();
+                horzPts.Where(p => p.X.IsCloseTo(horzPtsMin)).ToList().ForEach(p => p.IsLocked = true && p.IsPixeled);
             }
             else
             {
-                var vertPts = nodeDictionary.Where(x => x.Key.Item1 == coord.Item1).ToList().Select(x => x.Value);
+                var vertPts = nodeDictionary.Where(x => x.Key.Item1 == coord.Item1).ToList().Select(x => x.Value).ToList();
+                List<Core.Geometry.Point2d> newPts = new List<Core.Geometry.Point2d>();
                 foreach (var pt in vertPts)
                 {
                     var myCoord = nodeList.IndexOf(pt);
                     foreach (var p in pixelList.Where(p => p.ContainsNode(myCoord, true)).ToList())
                     {
                         p.ChangeStateTo(PixelState.Moment);
+                        newPts.Add(nodeList[p.BottomLeft]);
+                        newPts.Add(nodeList[p.BottomRight]);
                     }
                 }
+                vertPts.AddRange(newPts);
+                // Lock support points (BOTTOM)
+                var vertPtsMin = vertPts.Select(p => p.Y).Min();
+                vertPts.Where(p => p.Y.IsCloseTo(vertPtsMin)).ToList().ForEach(p => p.IsLocked = true && p.IsPixeled);
             }
 
             foreach (var p in pixelList.Where(p => p.ContainsNode(spi)).ToList())
