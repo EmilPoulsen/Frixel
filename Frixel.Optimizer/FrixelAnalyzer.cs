@@ -58,8 +58,8 @@ namespace Frixel.Optimizer
                     var startLoc = truss.StartNode.Location;
                     var endLoc = truss.EndNode.Location;
 
-                    
-                    //double dist = 
+                    double initialDist = Distance(startLoc, endLoc);
+
 
 
                 }

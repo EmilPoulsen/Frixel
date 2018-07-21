@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="FrixelAnalyzer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StructuralFitness.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
