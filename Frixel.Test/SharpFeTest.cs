@@ -30,6 +30,7 @@ namespace Frixel.Test {
             IMaterial material = new GenericElasticMaterial(0, 70000000, 0, 0);
             ICrossSection section = new SolidRectangle(0.03, 0.01);
 
+
             LinearTruss truss1 = model.ElementFactory.CreateLinearTruss(node1, node2, material, section);
             LinearTruss truss2 = model.ElementFactory.CreateLinearTruss(node1, node3, material, section);
             LinearTruss truss3 = model.ElementFactory.CreateLinearTruss(node2, node3, material, section);
@@ -155,9 +156,9 @@ namespace Frixel.Test {
             LinearTruss truss19 = model.ElementFactory.CreateLinearTruss(node5, node10, material, section);
             LinearTruss truss20 = model.ElementFactory.CreateLinearTruss(node6, node9, material, section);
 
-            ForceVector force50Z = model.ForceFactory.CreateForTruss(50000, 0);
-            model.ApplyForceToNode(force50Z, node4);
-            model.ApplyForceToNode(force50Z, node8);
+            ForceVector force50Z = model.ForceFactory.CreateForTruss(0, 50000);
+            model.ApplyForceToNode(force50Z, node11);
+            //model.ApplyForceToNode(force50Z, node8);
 
             IFiniteElementSolver solver = new MatrixInversionLinearSolver(model);
             FiniteElementResults results = solver.Solve();

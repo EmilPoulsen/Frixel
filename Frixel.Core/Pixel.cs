@@ -5,18 +5,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Frixel.Core.Geometry;
 
-namespace Frixel.Core
-{
-    public class Pixel
-    {
+namespace Frixel.Core {
+    public class Pixel {
         public readonly PixelState State;
         public readonly int TopLeft;
         public readonly int TopRight;
         public readonly int BottomRight;
         public readonly int BottomLeft;
 
-        public Pixel(int topLeft, int topRight, int botLeft, int botRight, PixelState state)
-        {
+        public Pixel(int topLeft, int topRight, int botLeft, int botRight, PixelState state) {
             this.TopLeft = topLeft;
             this.TopRight = topRight;
             this.BottomLeft = botLeft;
@@ -24,8 +21,7 @@ namespace Frixel.Core
             this.State = state;
         }
 
-        public List<Edge> GetEdges()
-        {
+        public List<Edge> GetEdges() {
             return new List<Edge>()
             {
                 new Edge(this.TopLeft, this.TopRight),
@@ -35,10 +31,8 @@ namespace Frixel.Core
             };
         }
 
-        public List<Edge> GetBracing()
-        {
-            switch (State)
-            {
+        public List<Edge> GetBracing() {
+            switch (State) {
                 case PixelState.Moment:
                     var x1 = new Edge(this.TopLeft, this.BottomRight);
                     var x2 = new Edge(this.TopRight, this.BottomLeft);
@@ -49,8 +43,7 @@ namespace Frixel.Core
             return new List<Edge>();
         }
 
-        public List<Edge> GetAllEdges()
-        {
+        public List<Edge> GetAllEdges() {
             var edgeList = new List<Edge>();
             edgeList.AddRange(GetEdges());
             edgeList.AddRange(GetBracing());
@@ -59,19 +52,16 @@ namespace Frixel.Core
 
     }
 
-    public class Edge
-    {
+    public class Edge {
         public int Start;
         public int End;
 
-        public Edge(int s, int e)
-        {
+        public Edge(int s, int e) {
             this.Start = s;
             this.End = e;
         }
 
-        public override bool Equals(object obj)
-        {
+        public override bool Equals(object obj) {
             if (obj.GetType() != typeof(Edge)) return false;
             var objEdge = obj as Edge;
             if (this.Start == objEdge.Start && this.End == objEdge.End) return true;
@@ -80,11 +70,12 @@ namespace Frixel.Core
 
     }
 
-    public class PixelStructure
-    {
+    public class PixelStructure {
         public List<Point2d> Nodes;
         public List<Edge> Edges;
         public List<Pixel> Pixels;
+        public WindLoad WindLoad;
+        public GravityLoad GravityLoad;
 
         public PixelStructure() { }
 
@@ -93,24 +84,49 @@ namespace Frixel.Core
         /// </summary>
         /// <param name="nodes"></param>
         /// <param name="pixels"></param>
-        public PixelStructure(List<Point2d> nodes, List<Pixel> pixels)
-        {
+        public PixelStructure(List<Point2d> nodes, List<Pixel> pixels) {
             this.Nodes = nodes;
             this.Pixels = pixels;
 
             // Generates edges from pixels
             var allEdges = pixels.SelectMany(p => p.GetEdges());
 
-            Edges = allEdges.Distinct().ToList();         
+            Edges = allEdges.Distinct().ToList();
         }
 
-        public List<Line2d> GetLines()
-        {
-            return Edges.Select(e =>
-            {
+        public List<Line2d> GetLines() {
+            return Edges.Select(e => {
                 return new Line2d(Nodes[e.Start], Nodes[e.End]);
             }).ToList();
         }
+    }
+
+    public abstract class Load {
+        
+        //bla bla common properties and shit
+
+    }
+
+    public class GravityLoad : Load {
+        public bool Activated { get; set; }
+        
+        public double Amplification { get; set; }
+
+    }
+
+    public class WindLoad : Load {
+        
+        public WindLoad() {
+
+            this.NodeIndices = new List<int>();
+            this.Direction = new Point2d(0, 1);
+        }
+
+        public bool Activated { get; set; }
+
+        public List<int> NodeIndices { get; set; }
+
+        public Point2d Direction { get; set; }
     }
 
     public enum PixelState
