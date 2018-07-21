@@ -50,6 +50,9 @@
       <HintPath>..\packages\GeneticSharp.1.2.0\lib\net35\NCalc.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SharpFE.Core">
+      <HintPath>lib\SharpFE.Core.dll</HintPath>
+    </Reference>
     <Reference Include="SmartThreadPool, Version=2.2.4.0, Culture=neutral, PublicKeyToken=1126fe8b671e8a79, processorArchitecture=MSIL">
       <HintPath>..\packages\SmartThreadPool.dll.2.2.4\lib\net45\SmartThreadPool.dll</HintPath>
       <Private>True</Private>
