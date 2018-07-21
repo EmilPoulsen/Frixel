@@ -99,6 +99,17 @@ namespace Frixel.Core {
                 return new Line2d(Nodes[e.Start], Nodes[e.End]);
             }).ToList();
         }
+
+        public List<Line2d> GetAllLInes()
+        {
+            return Pixels.SelectMany(p =>
+            {
+                return p.GetAllEdges();
+            }).Select(e =>
+           {
+               return new Line2d(Nodes[e.Start], Nodes[e.End]);
+           }).ToList();
+        }
     }
 
     public abstract class Load {

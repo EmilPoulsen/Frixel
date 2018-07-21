@@ -33,14 +33,20 @@ namespace Frixel.UI
         /// <summary>
         /// Margin of canvas in pixels
         /// </summary>
-        const double CanvasMargin = 20; 
+        const double CanvasMargin = 60;
+
+        public delegate FrixelReferenceData PixelStructurePass(double xSize, double ySize);
+        public static event PixelStructurePass ReferenceFromRhino;
+
 
         private double _xGridSize;
         private double _yGridSize;
         private bool _isRunning;
         private bool _isRedrawing;
         private Tuple<Domain, Domain> _sliderMappingDomains;
+
         private PixelStructure _pixelStructure;
+        private List<Line2d> _actualMassingOutline;
 
 
         public MainWindow(PixelStructure pixelStructure)
@@ -72,7 +78,8 @@ namespace Frixel.UI
 
         private void btn_RefGeo_Click(object sender, RoutedEventArgs e)
         {
-            // Something
+            var refData = ReferenceFromRhino(_xGridSize,_yGridSize);
+            SetReferenceData(refData);
             this.Redraw();
         }
 
@@ -88,8 +95,24 @@ namespace Frixel.UI
             DrawGridSize();
         }
 
+        private void sld_WindLoad_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        private void sld_GravLoad_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            //throw new NotImplementedException();
+        }
+
 
         #endregion
+
+        private void SetReferenceData(FrixelReferenceData refData)
+        {
+            this._pixelStructure = refData.Structure;
+            this._actualMassingOutline = refData.ActualShape;
+        }
 
         private void Redraw()
         {
@@ -115,14 +138,20 @@ namespace Frixel.UI
                 new Domain(canvasHeight - CanvasMargin, 0 + CanvasMargin)
                 );
 
-            List<Line> linesToDraw = _pixelStructure.GetLines().Select(l =>
+            List<Line> pxsLines = _pixelStructure.GetAllLInes().Select(l =>
             {
                 return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Black);
             }).ToList();
+            List<Line> actualMassingLInes = _actualMassingOutline.Select(l =>
+            {
+                return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Red);
+            }).ToList();
 
             // Add lines to canvas 
-            linesToDraw.ForEach(l => canv_Main.Children.Add(l));
+            pxsLines.ForEach(l => canv_Main.Children.Add(l));
+            actualMassingLInes.ForEach(l => canv_Main.Children.Add(l));
 
+            // Set state
             this._isRedrawing = false;
         }
 
@@ -135,6 +164,11 @@ namespace Frixel.UI
         private void ClearCanvas()
         {
             this.canv_Main.Children.Clear();
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Redraw();
         }
 
 

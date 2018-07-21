@@ -36,7 +36,7 @@ namespace Frixel.Core.Test
                 new Pixel(1,2,0,3,PixelState.Moment),
                 new Pixel(2,4,3,5,PixelState.None),
                 new Pixel(4,6,5,7,PixelState.None),
-                new Pixel(8,9,0,1,PixelState.Moment)
+                new Pixel(8,9,1,2,PixelState.Moment)
             }
        );
     }
