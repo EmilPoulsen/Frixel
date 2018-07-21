@@ -83,12 +83,17 @@ namespace Frixel.Optimizer {
 
             _numPixels = numPixels;
 
+            //int s = RandomizationProvider.Current.GetInt(0, 1);
+            Random rand = new Random();
+
+
             for (int i = 0; i < numPixels; i++) {
                 PixSwitch piswi = new PixSwitch();
 
-                int s = RandomizationProvider.Current.GetInt(0, 1);
 
-                piswi.Switch = s == 0 ? false : true;
+                bool s = rand.Next(0, 2) == 0;
+
+                    piswi.Switch = s;
                 ReplaceGene(i, new Gene(piswi));
             }
 
@@ -154,6 +159,7 @@ namespace Frixel.Optimizer {
                         }
                     }
                 }
+                i++;
             }
             var results = frixAnalyzer.AnalyzeModel(model);
 
