@@ -44,7 +44,7 @@ namespace Frixel.Optimizer
                 
                 pixResults.NodeResults.Add(i, new NodeResult() {
                     DispX = disp.X,
-                    DispY = disp.Y
+                    DispY = disp.Z
                 });
                 i++;
             }
@@ -57,7 +57,8 @@ namespace Frixel.Optimizer
         public SharpFE.FiniteElementModel BuildModel(PixelStructure structure) {
 
             FiniteElementModel model = new FiniteElementModel(ModelType.Truss2D);
-            IMaterial material = new GenericElasticMaterial(0, 70000000, 0, 0);
+            IMaterial material = new GenericElasticMaterial(7700, 210.0e9, 0.3, 210.0e9 / 2.69);
+
             ICrossSection section = new SolidRectangle(0.03, 0.01);
 
             foreach (var node in structure.Nodes) {
@@ -95,9 +96,9 @@ namespace Frixel.Optimizer
             }
 
             var wind = AddWindLoad(structure, model);
-            //var grav = AddGravityLoad(structure, model);
+            var grav = AddGravityLoad(structure, model);
 
-            var combined = wind;//CombineDict(wind, grav);
+            var combined = CombineDict(wind, grav);
 
             foreach (var pair in combined) {
 
@@ -131,8 +132,8 @@ namespace Frixel.Optimizer
                 else {
                     wind[pair.Key] = new ForceVector(
                         wind[pair.Key].X + pair.Value.X,
-                        wind[pair.Key].Y + pair.Value.Z,
-                        wind[pair.Key].Z + pair.Value.Y
+                        wind[pair.Key].Y + pair.Value.Y,
+                        wind[pair.Key].Z + pair.Value.Z
                         );
                 }
             }
@@ -159,6 +160,7 @@ namespace Frixel.Optimizer
 
                         map[node] = new ForceVector(
                             map[node].X + forceX,
+                            0,
                             map[node].Z + forceY
                          );
                     }
