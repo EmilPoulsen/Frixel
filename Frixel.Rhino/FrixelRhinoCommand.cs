@@ -162,6 +162,19 @@ namespace Frixel.Rhinoceros
                 }
             }
 
+            // Remove unpixeled nodes and update nodeList
+            var nodeListCopy = nodeList.Where(n => n.IsPixeled).ToList();
+            foreach(var p in pixelList)
+            {
+                p.UpdateTopology(
+                    nodeListCopy.IndexOf(nodeList[p.TopLeft]),
+                    nodeListCopy.IndexOf(nodeList[p.TopRight]),
+                    nodeListCopy.IndexOf(nodeList[p.BottomLeft]),
+                    nodeListCopy.IndexOf(nodeList[p.BottomRight])
+                );
+            }
+            nodeList = nodeListCopy;
+
             // Find the closest node to the spine line
             Tuple<double, int> closestPoint = null;
             var crv = new Rhino.Geometry.Line(_spine.Item1, _spine.Item2).ToNurbsCurve();
@@ -205,7 +218,7 @@ namespace Frixel.Rhinoceros
                 horzPts.AddRange(newPts);
                 // Lock support points (LEFT)
                 var horzPtsMin = horzPts.Select(p => p.X).Min();
-                horzPts.Where(p => p.X.IsCloseTo(horzPtsMin)).ToList().ForEach(p => p.IsLocked = true && p.IsPixeled);
+                nodeList.Where(p => p.X.IsCloseTo(horzPtsMin)).ToList().ForEach(p => p.IsLocked = true);
             }
             else
             {
@@ -224,7 +237,12 @@ namespace Frixel.Rhinoceros
                 vertPts.AddRange(newPts);
                 // Lock support points (BOTTOM)
                 var vertPtsMin = vertPts.Select(p => p.Y).Min();
-                vertPts.Where(p => p.Y.IsCloseTo(vertPtsMin)).ToList().ForEach(p => p.IsLocked = true && p.IsPixeled);
+                vertPts.Where(p => p.Y.IsCloseTo(vertPtsMin)).ToList().ForEach(p => p.IsLocked = true);
+                pixelList.ForEach(p =>
+                {
+                    if (nodeList[p.BottomLeft].Y.IsCloseTo(vertPtsMin)) { nodeList[p.BottomLeft].IsLocked = true; }
+                    if (nodeList[p.BottomRight].Y.IsCloseTo(vertPtsMin)) { nodeList[p.BottomRight].IsLocked = true; }
+                });
             }
 
             foreach (var p in pixelList.Where(p => p.ContainsNode(spi)).ToList())
@@ -245,6 +263,8 @@ namespace Frixel.Rhinoceros
                                                           plinePoints[i + 1].ToFrixelPoint())
                 );
             }
+
+
 
             // Return the data
             return new UI.FrixelReferenceData(pixelStruct, massingLines, Boundingbox);
@@ -331,6 +351,7 @@ namespace Frixel.Rhinoceros
 
             // Create a FrixelWindow
             if(_window == null) { _window = new Frixel.UI.MainWindow();
+                _window.Closed += _window_Closed;
                 RhinoApp.WriteLine("Launching Frixel Window", EnglishName);
                 new System.Windows.Interop.WindowInteropHelper(_window).Owner = Rhino.RhinoApp.MainWindowHandle();
                 this._doc = doc;
@@ -340,6 +361,11 @@ namespace Frixel.Rhinoceros
             _window.Show();
 
             return Result.Success;
+        }
+
+        private void _window_Closed(object sender, EventArgs e)
+        {
+            this._window = null;
         }
 
         private UI.FrixelReferenceData MainWindow_UpdateRhino(double xSize, double ySize)

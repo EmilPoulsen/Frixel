@@ -8,10 +8,10 @@ using Frixel.Core.Geometry;
 namespace Frixel.Core {
     public class Pixel {
         public PixelState State { get; private set; }
-        public readonly int TopLeft;
-        public readonly int TopRight;
-        public readonly int BottomRight;
-        public readonly int BottomLeft;
+        public int TopLeft { get; private set; }
+        public int TopRight { get; private set; }
+        public int BottomRight { get; private set; }
+        public int BottomLeft { get; private set; }
 
         public Pixel(int topLeft, int topRight, int botLeft, int botRight, PixelState state) {
             this.TopLeft = topLeft;
@@ -19,6 +19,14 @@ namespace Frixel.Core {
             this.BottomLeft = botLeft;
             this.BottomRight = botRight;
             this.State = state;
+        }
+
+        public void UpdateTopology(int topleft, int topright, int botleft, int botright)
+        {
+            this.TopLeft = topleft;
+            this.TopRight = topright;
+            this.BottomLeft = botleft;
+            this.BottomRight = botright;
         }
 
         public List<Edge> GetEdges() {
@@ -100,6 +108,7 @@ namespace Frixel.Core {
 
     public class PixelStructure {
         public List<Point2d> Nodes;
+        public List<Point2d> DispNodes;
         public List<Edge> Edges;
         public List<Pixel> Pixels;
         public WindLoad WindLoad;
@@ -107,25 +116,32 @@ namespace Frixel.Core {
 
         public PixelStructure() {
             this.Nodes = new List<Point2d>();
+            this.DispNodes = new List<Point2d>();
             this.Edges = new List<Edge>();
             this.Pixels = new List<Pixel>();
             this.WindLoad = new WindLoad();
             this.GravityLoad = new GravityLoad();
         }
 
-        /// <summary>
-        /// Constructor for testing.
-        /// </summary>
-        /// <param name="nodes"></param>
-        /// <param name="pixels"></param>
         public PixelStructure(List<Point2d> nodes, List<Pixel> pixels) {
             this.Nodes = nodes;
             this.Pixels = pixels;
+            this.DispNodes = nodes.Select(n =>
+            {
+                return new Point2d(n.X, n.Y)
+                {
+                    IsLocked = n.IsLocked,
+                    IsInside = n.IsInside,
+                    IsPixeled = n.IsPixeled,
+                };
+            }).ToList();
 
             // Generates edges from pixels
             var allEdges = pixels.SelectMany(p => p.GetEdges());
 
             Edges = allEdges.Distinct().ToList();
+            this.WindLoad = new WindLoad();
+            this.GravityLoad = new GravityLoad();
         }
 
         public List<Line2d> GetLines() {
@@ -134,15 +150,31 @@ namespace Frixel.Core {
             }).ToList();
         }
 
-        public List<Line2d> GetAllLInes()
+        public List<Line2d> GetAllLInes(bool disp)
+        {
+            var pix = Pixels.SelectMany(p =>
+            {
+                return p.GetAllEdges();
+            });
+            if(disp) return pix.Select(e => new Line2d(DispNodes[e.Start], DispNodes[e.End])).ToList();
+            else return pix.Select(e => new Line2d(Nodes[e.Start], Nodes[e.End])).ToList();
+        }
+
+        public List<Edge> GetAllEdges()
         {
             return Pixels.SelectMany(p =>
             {
                 return p.GetAllEdges();
-            }).Select(e =>
-           {
-               return new Line2d(Nodes[e.Start], Nodes[e.End]);
-           }).ToList();
+            }).ToList();
+        }
+
+        public void ResetDisp()
+        {
+            for (int i = 0; i < this.Nodes.Count; i++)
+            {
+                this.DispNodes[i].X = this.Nodes[i].X;
+                this.DispNodes[i].Y = this.Nodes[i].Y;
+            }
         }
     }
 
@@ -190,9 +222,9 @@ namespace Frixel.Core {
         
     }
 
-    public class AnalysisResults {
+    public class _analysisResults {
 
-        public AnalysisResults() {
+        public _analysisResults() {
             this.NodeResults = new Dictionary<int, NodeResult>();
         }
 

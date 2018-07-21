@@ -52,6 +52,9 @@ namespace Frixel.UI
         private List<Line2d> _actualMassingOutline;
         private Domain2d _massingDomain;
 
+        private _analysisResults _analysisResults;
+        private double _windLoad;
+        private List<double> _dispMap = new List<double>();
 
         public MainWindow(PixelStructure pixelStructure)
         {
@@ -87,6 +90,8 @@ namespace Frixel.UI
         private void DrawGridSize()
         {
             this.tb_GridSize.Text = _xGridSize + "', " + _yGridSize + "'";
+            this.tb_gridX.Text = _xGridSize + "'";
+            this.tb_gridY.Text = _yGridSize + "'";
         }
 
         #region Events
@@ -120,12 +125,16 @@ namespace Frixel.UI
 
         private void sld_WindLoad_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            //throw new NotImplementedException();
+            if (_analysisResults == null) { return; }
+            else { AnalyzeAndRedraw(); }
+            tb_WindLoad.Text = Math.Round(sld_WindLoad.Value.Map(new Domain(0, 1), new Domain(0, 10))).ToString();
         }
 
         private void sld_GravLoad_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            //throw new NotImplementedException();
+            if(_analysisResults == null) { return; }
+            Redisplace();
+            tb_GravLoad.Text = Math.Round(sld_GravLoad.Value.Map(new Domain(0, 1), new Domain(0, 10))).ToString();
         }
 
 
@@ -133,12 +142,13 @@ namespace Frixel.UI
 
         private void SetUpdated(FrixelReferenceData refData)
         {
+            if(refData == null) { return; }
             this._pixelStructure = refData.Structure;
             this._actualMassingOutline = refData.ActualShape;
             this._massingDomain = refData.BoundingBox;
         }
 
-        private void Redraw()
+        private void Redraw(bool renderDisp = false)
         {
 
             // Set state
@@ -175,11 +185,32 @@ namespace Frixel.UI
                 double XscaleFactor = _massingDomain.AspectRatioX;
                 canvasDomain.Y.ScaleMid(XscaleFactor);
             }
-
-            List<Line> pxsLines = _pixelStructure.GetAllLInes().Select(l =>
+            List<Line> pxsLines = _pixelStructure.GetAllLInes(renderDisp).Select(l =>
             {
                 return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Gray);
             }).ToList();
+
+            if (renderDisp)
+            {
+                // Add analysis colors
+                List<double> edgeMap = new List<double>();
+                _pixelStructure.GetAllEdges().ForEach(e =>
+                {
+                    edgeMap.Add(_dispMap[e.Start] + _dispMap[e.End]);
+                });
+                var startingDomain = new Domain(
+                    edgeMap.Min(),
+                    edgeMap.Max()
+                    );
+                var redDomain = new Domain(0, 255);
+                int i = 0;
+                pxsLines.ForEach(l =>
+                {
+                    l.Stroke = new SolidColorBrush(Color.FromArgb(255, System.Convert.ToByte(edgeMap[i].Map(startingDomain, redDomain)), 0, 0));
+                    i++;
+                });
+            }
+
             List<Line> actualMassingLInes = _actualMassingOutline.Select(l =>
             {
                 return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.LightBlue);
@@ -221,8 +252,58 @@ namespace Frixel.UI
 
         private void btn_Run_Click(object sender, RoutedEventArgs e)
         {
-            // Run an analysis
+            AnalyzeAndRedraw();
+        }
 
+        private void AnalyzeAndRedraw()
+        {
+            // Set stuff
+            _pixelStructure.GravityLoad.Activated = true;
+            _pixelStructure.GravityLoad.Amplification = 10000;
+
+            if (this.sld_WindLoad.Value != null)
+            {
+                _pixelStructure.WindLoad.Activated = true;
+                _pixelStructure.WindLoad.Direction = new Point2d(1000000 * sld_WindLoad.Value, 0);
+                _pixelStructure.WindLoad.NodeIndices = _pixelStructure.Nodes.Select(n => _pixelStructure.Nodes.IndexOf(n)).ToList();
+            }
+
+            // Run an analysis
+            try
+            {
+                var anal = new Optimizer.FrixelAnalyzer();
+                this._analysisResults = anal.Analyze(_pixelStructure);
+                Redisplace();
+                Redraw(true);
+            }
+            catch (Exception asd) { this._analysisResults = null; Redraw(); MessageBox.Show(asd.Message); }
+        }
+
+        private void Redisplace()
+        {
+            _pixelStructure.ResetDisp();
+            _dispMap.Clear();
+            for (int i = 0; i < _pixelStructure.Nodes.Count; i++)
+            {
+                _pixelStructure.DispNodes[i].X += _analysisResults.NodeResults[i].DispX * sld_GravLoad.Value;
+                _pixelStructure.DispNodes[i].Y += _analysisResults.NodeResults[i].DispY * sld_GravLoad.Value;
+                _dispMap.Add(_analysisResults.NodeResults[i].DispX + _analysisResults.NodeResults[i].DispY);
+            }
+            Redraw(true);
+        }
+
+        private void btn_Reset_Click(object sender, RoutedEventArgs e)
+        {
+            this._analysisResults = null;
+            var update = UpdateRhino(_xGridSize, _yGridSize);
+            SetUpdated(update);
+            Redraw();
+        }
+
+        private void btn_BraceAll_Click(object sender, RoutedEventArgs e)
+        {
+            this._pixelStructure.Pixels.ForEach(p => p.ChangeStateTo(PixelState.Moment));
+            Redraw();
         }
 
 
