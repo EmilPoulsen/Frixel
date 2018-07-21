@@ -221,8 +221,21 @@ namespace Frixel.UI
 
         private void btn_Run_Click(object sender, RoutedEventArgs e)
         {
-            // Run an analysis
+            // Set stuff
+            _pixelStructure.GravityLoad.Activated = true;
+            _pixelStructure.GravityLoad.Amplification = 10000;
 
+            // Run an analysis
+            var anal = new Optimizer.FrixelAnalyzer();
+            var results = anal.Analyze(_pixelStructure);
+
+            for(int i = 0; i<_pixelStructure.Nodes.Count; i++)
+            {
+                _pixelStructure.Nodes[i].X += results.NodeResults[i].DispX;
+                _pixelStructure.Nodes[i].Y += results.NodeResults[i].DispY;
+            }
+
+            Redraw();
         }
 
 

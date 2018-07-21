@@ -124,6 +124,8 @@ namespace Frixel.Core {
             var allEdges = pixels.SelectMany(p => p.GetEdges());
 
             Edges = allEdges.Distinct().ToList();
+            this.WindLoad = new WindLoad();
+            this.GravityLoad = new GravityLoad();
         }
 
         public List<Line2d> GetLines() {

@@ -202,7 +202,6 @@ namespace Frixel.Optimizer
                 if (structure.GravityLoad.Activated) {
                     double amp = structure.GravityLoad.Amplification;
                     map = model.AddGravityLoad(amp);
-
                 }
             }
             return map;

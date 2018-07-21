@@ -205,7 +205,7 @@ namespace Frixel.Rhinoceros
                 horzPts.AddRange(newPts);
                 // Lock support points (LEFT)
                 var horzPtsMin = horzPts.Select(p => p.X).Min();
-                horzPts.Where(p => p.X.IsCloseTo(horzPtsMin)).ToList().ForEach(p => p.IsLocked = true && p.IsPixeled);
+                nodeList.Where(p => p.X.IsCloseTo(horzPtsMin)).ToList().ForEach(p => p.IsLocked = true);
             }
             else
             {
@@ -224,7 +224,12 @@ namespace Frixel.Rhinoceros
                 vertPts.AddRange(newPts);
                 // Lock support points (BOTTOM)
                 var vertPtsMin = vertPts.Select(p => p.Y).Min();
-                vertPts.Where(p => p.Y.IsCloseTo(vertPtsMin)).ToList().ForEach(p => p.IsLocked = true && p.IsPixeled);
+                vertPts.Where(p => p.Y.IsCloseTo(vertPtsMin)).ToList().ForEach(p => p.IsLocked = true);
+                pixelList.ForEach(p =>
+                {
+                    if (nodeList[p.BottomLeft].Y.IsCloseTo(vertPtsMin)) { nodeList[p.BottomLeft].IsLocked = true; }
+                    if (nodeList[p.BottomRight].Y.IsCloseTo(vertPtsMin)) { nodeList[p.BottomRight].IsLocked = true; }
+                });
             }
 
             foreach (var p in pixelList.Where(p => p.ContainsNode(spi)).ToList())

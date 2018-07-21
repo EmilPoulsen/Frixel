@@ -64,6 +64,10 @@
       <Project>{02d6340d-35cb-488c-bd0a-269d0a9b184d}</Project>
       <Name>Frixel.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Frixel.Optimizer\Frixel.Optimizer.csproj">
+      <Project>{5f199cfd-b7c4-4c36-b7be-85387c684348}</Project>
+      <Name>Frixel.Optimizer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
