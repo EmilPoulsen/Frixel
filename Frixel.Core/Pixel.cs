@@ -50,8 +50,17 @@ namespace Frixel.Core {
             return edgeList;
         }
 
-        public bool ContainsNode(int nodeIndex)
+        public bool ContainsNode(int nodeIndex, bool oneSideOnly = false)
         {
+            if (oneSideOnly)
+            {
+                if (this.BottomLeft == nodeIndex
+                  | this.TopLeft == nodeIndex)
+                {
+                    return true;
+                }
+                return false;
+            }
             if (this.BottomLeft == nodeIndex
               | this.BottomRight == nodeIndex
               | this.TopLeft == nodeIndex

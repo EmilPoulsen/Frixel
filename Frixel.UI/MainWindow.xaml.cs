@@ -38,6 +38,9 @@ namespace Frixel.UI
         public delegate FrixelReferenceData PixelStructurePass(double xSize, double ySize);
         public static event PixelStructurePass ReferenceFromRhino;
 
+        public delegate FrixelReferenceData PixelStructureUpdate(double xSize, double ySize);
+        public static event PixelStructureUpdate UpdateRhino;
+
 
         private double _xGridSize;
         private double _yGridSize;
@@ -93,19 +96,25 @@ namespace Frixel.UI
             var refData = ReferenceFromRhino(_xGridSize,_yGridSize);
             if(refData == null) { return; }
 
-            SetReferenceData(refData);
+            SetUpdated(refData);
             this.Redraw();
         }
 
         private void sld_GridX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             _xGridSize = GridSize(sld_GridX.Value);
+            var updated = UpdateRhino(_xGridSize, _yGridSize);
+            SetUpdated(updated);
+            this.Redraw();
             DrawGridSize();
         }
 
         private void sld_GridY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             _yGridSize = GridSize(sld_GridY.Value);
+            var updated = UpdateRhino(_xGridSize, _yGridSize);
+            SetUpdated(updated);
+            this.Redraw();
             DrawGridSize();
         }
 
@@ -122,7 +131,7 @@ namespace Frixel.UI
 
         #endregion
 
-        private void SetReferenceData(FrixelReferenceData refData)
+        private void SetUpdated(FrixelReferenceData refData)
         {
             this._pixelStructure = refData.Structure;
             this._actualMassingOutline = refData.ActualShape;
@@ -152,17 +161,28 @@ namespace Frixel.UI
 
             // Get canvas ready lines
             var canvasDomain = new Domain2d(
-                new Domain(canvasWidth - CanvasMargin, 0 + CanvasMargin),
+                new Domain(0 + CanvasMargin, canvasWidth - CanvasMargin),
                 new Domain(canvasHeight - CanvasMargin, 0 + CanvasMargin)
                 );
+            // Scale the canvas domain to the aspect ratio of the input domain
+            if (_massingDomain.X.IsLargerThan(_massingDomain.Y))
+            {
+                double YscaleFactor = _massingDomain.AspectRatioY;
+                canvasDomain.Y.ScaleMid(YscaleFactor);
+            }
+            else
+            {
+                double XscaleFactor = _massingDomain.AspectRatioX;
+                canvasDomain.Y.ScaleMid(XscaleFactor);
+            }
 
             List<Line> pxsLines = _pixelStructure.GetAllLInes().Select(l =>
             {
-                return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Black);
+                return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Gray);
             }).ToList();
             List<Line> actualMassingLInes = _actualMassingOutline.Select(l =>
             {
-                return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Red);
+                return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.LightBlue);
             }).ToList();
 
             // Add lines to canvas 

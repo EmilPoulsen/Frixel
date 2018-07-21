@@ -53,6 +53,17 @@ namespace Frixel.Rhinoceros
             return result;
         }
 
+        public static bool AtLeastXInside(bool a, bool b, bool c, bool d, int x)
+        {
+            int howMany  = 0;
+            if (a) howMany++;
+            if (b) howMany++;
+            if (c) howMany++;
+            if (d) howMany++;
+            if(howMany >= x) { return true; }
+            return false;
+        }
+
         public static double Distance(Point3f a, Point3f b)
         {
             return Math.Sqrt(Math.Pow((a.X - b.X), 2) + Math.Pow((a.Y - b.Y), 2) + Math.Pow((a.Z - b.Z), 2));
