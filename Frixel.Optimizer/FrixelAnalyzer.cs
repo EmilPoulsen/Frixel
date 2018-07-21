@@ -66,9 +66,40 @@ namespace Frixel.Optimizer
                 }
             }
 
-
-
+            AddWindLoad(structure, model);
+            AddGravityLoad(structure, model);
+            
             return model;
+
+        }
+
+
+        private static void AddWindLoad(PixelStructure structure, FiniteElementModel model) {
+
+            if(structure.WindLoad != null) {
+                if (structure.WindLoad.Activated) {
+
+                    double forceX = structure.WindLoad.Direction.X;
+                    double forceY = structure.WindLoad.Direction.Y;
+                    foreach (var i in structure.WindLoad.NodeIndices) {
+
+                        var node = model.Nodes.ElementAt(i);
+                        ForceVector force = model.ForceFactory.CreateForTruss(forceX, forceY);
+                        model.ApplyForceToNode(force, node);
+                    }
+                }
+            }
+        }
+
+        private static void AddGravityLoad(PixelStructure structure, FiniteElementModel model) {
+
+            if(structure.GravityLoad != null) {
+                if (structure.GravityLoad.Activated) {
+                    double amp = structure.GravityLoad.Amplification;
+                    model.AddGravityLoad(amp);
+
+                }
+            }
 
         }
 
