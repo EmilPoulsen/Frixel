@@ -117,9 +117,12 @@ namespace Frixel.Core {
     public class WindLoad : Load {
         
         public WindLoad() {
+
             this.NodeIndices = new List<int>();
             this.Direction = new Point2d(0, 1);
         }
+
+        public bool Activated { get; set; }
 
         public List<int> NodeIndices { get; set; }
 
