@@ -34,12 +34,19 @@ namespace Frixel.Optimizer
             int i = 0;
             foreach (var node in model.Nodes) {
 
-                var disp = results.GetDisplacement(node);
-
+                DisplacementVector disp = null;
+                if (results.DisplacementVectorExists(node)) {
+                    disp = results.GetDisplacement(node);
+                }
+                else {
+                    disp = new DisplacementVector(node, 0, 0);
+                }
+                
                 pixResults.NodeResults.Add(i, new NodeResult() {
                     DispX = disp.X,
                     DispY = disp.Y
                 });
+                i++;
             }
 
             return pixResults;
@@ -87,15 +94,55 @@ namespace Frixel.Optimizer
                 }
             }
 
-            AddWindLoad(structure, model);
-            AddGravityLoad(structure, model);
-            
+            var wind = AddWindLoad(structure, model);
+            //var grav = AddGravityLoad(structure, model);
+
+            var combined = wind;//CombineDict(wind, grav);
+
+            foreach (var pair in combined) {
+
+                ForceVector force100Z;
+                if (!model.Forces.Contains(pair.Value)) {
+                    force100Z = model.ForceFactory.CreateForTruss(pair.Value.X, pair.Value.Z);
+                }
+                else {
+                    force100Z = pair.Value;
+                }
+
+                model.ApplyForceToNode(force100Z, pair.Key);
+            }
+
             return model;
 
         }
 
 
-        private static void AddWindLoad(PixelStructure structure, FiniteElementModel model) {
+        private static Dictionary<IFiniteElementNode, ForceVector> CombineDict(
+            Dictionary<IFiniteElementNode, ForceVector> gravity,
+            Dictionary<IFiniteElementNode, ForceVector> wind) {
+
+            //Dictionary<IFiniteElementNode, ForceVector> combined = new Dictionary<IFiniteElementNode, ForceVector>();
+
+            foreach (var pair in gravity) {
+
+                if (!wind.ContainsKey(pair.Key)) {
+                    wind.Add(pair.Key, pair.Value);
+                }
+                else {
+                    wind[pair.Key] = new ForceVector(
+                        wind[pair.Key].X + pair.Value.X,
+                        wind[pair.Key].Y + pair.Value.Z,
+                        wind[pair.Key].Z + pair.Value.Y
+                        );
+                }
+            }
+            return wind;
+
+        }
+
+        private static Dictionary<IFiniteElementNode, ForceVector> AddWindLoad(PixelStructure structure, FiniteElementModel model) {
+            Dictionary<IFiniteElementNode, ForceVector> map = new Dictionary<IFiniteElementNode, ForceVector>();
+
 
             if(structure.WindLoad != null) {
                 if (structure.WindLoad.Activated) {
@@ -105,22 +152,32 @@ namespace Frixel.Optimizer
                     foreach (var i in structure.WindLoad.NodeIndices) {
 
                         var node = model.Nodes.ElementAt(i);
-                        ForceVector force = model.ForceFactory.CreateForTruss(forceX, forceY);
-                        model.ApplyForceToNode(force, node);
+
+                        if (!map.ContainsKey(node)) {
+                            map.Add(node, new ForceVector(0,0,0));
+                        }
+
+                        map[node] = new ForceVector(
+                            map[node].X + forceX,
+                            map[node].Z + forceY
+                         );
                     }
                 }
             }
+            return map;
         }
 
-        private static void AddGravityLoad(PixelStructure structure, FiniteElementModel model) {
+        private static Dictionary<IFiniteElementNode, ForceVector> AddGravityLoad(PixelStructure structure, FiniteElementModel model) {
+            Dictionary<IFiniteElementNode, ForceVector> map = new Dictionary<IFiniteElementNode, ForceVector>();
 
-            if(structure.GravityLoad != null) {
+            if (structure.GravityLoad != null) {
                 if (structure.GravityLoad.Activated) {
                     double amp = structure.GravityLoad.Amplification;
-                    model.AddGravityLoad(amp);
+                    map = model.AddGravityLoad(amp);
 
                 }
             }
+            return map;
 
         }
     }

@@ -94,7 +94,13 @@ namespace Frixel.Core {
         public WindLoad WindLoad;
         public GravityLoad GravityLoad;
 
-        public PixelStructure() { }
+        public PixelStructure() {
+            this.Nodes = new List<Point2d>();
+            this.Edges = new List<Edge>();
+            this.Pixels = new List<Pixel>();
+            this.WindLoad = new WindLoad();
+            this.GravityLoad = new GravityLoad();
+        }
 
         /// <summary>
         /// Constructor for testing.
