@@ -18,7 +18,22 @@ using GeneticSharp.Domain.Randomizations;
 namespace Frixel.Optimizer {
 
 
+    public class FrixelEventArgs : EventArgs {
+
+        public AnalysisResults AnalysisResults { get; set; }
+
+        public double Fitness { get; set; }
+
+    }
+
     public class FrixelOptimizer {
+
+        public event EventHandler RanIteration;
+
+        protected virtual void OnRanIteration(EventArgs e) {
+            if (RanIteration != null)
+                RanIteration(this, e);
+        }
 
         public FrixelOptimizer() {
 
@@ -63,8 +78,12 @@ namespace Frixel.Optimizer {
 
             
             var results = structFitness.LatestResults;
+            
+            FrixelEventArgs args = new FrixelEventArgs();
+            args.AnalysisResults = results;
+            args.Fitness = structFitness.CurrentFitness;
 
-            string s = "";
+            OnRanIteration(args);
 
             //throw new NotImplementedException();
         }
