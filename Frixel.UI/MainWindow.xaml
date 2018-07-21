@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Frixel.UI"
         mc:Ignorable="d"
-        Title="Frixel" Height="337.5" Width="613.5" SizeChanged="Window_SizeChanged">
+        Title="Frixel" Height="337.5" Width="613.5" SizeChanged="Window_SizeChanged" ResizeMode="CanResizeWithGrip" x:Name="windowMain" AllowsTransparency="True" WindowStyle="None">
     <Grid Margin="0,0,2,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="109*"/>
@@ -83,5 +83,16 @@
         <Rectangle Grid.Column="2" Fill="White" HorizontalAlignment="Left" Height="369" Margin="0,10,0,-72" Grid.RowSpan="3" Stroke="#FFE6E6E6" VerticalAlignment="Top" Width="1"/>
         <TextBlock x:Name="tb_gridX" TextWrapping="Wrap" Text="gridsize" Margin="133,0,10,28" Height="16" VerticalAlignment="Bottom" Grid.Column="1"/>
         <TextBlock x:Name="tb_gridY" TextWrapping="Wrap" Text="gridsize" Margin="133,0,10,7" Height="16" VerticalAlignment="Bottom" Grid.Column="1"/>
+        <Grid x:Name="grd_FrixelSplash" HorizontalAlignment="Left" Height="307" Grid.RowSpan="3" VerticalAlignment="Top" Width="604" Background="White" Grid.ColumnSpan="3" Visibility="Hidden">
+            <Rectangle HorizontalAlignment="Left" Height="216" Margin="204,44,0,0" Stroke="#FFCDCDCD" VerticalAlignment="Top" Width="215" Fill="#00F4F4F5"/>
+            <Rectangle HorizontalAlignment="Left" Height="218" Margin="197,50,0,0" Stroke="#FFCDCDCD" VerticalAlignment="Top" Width="214" Fill="#00F4F4F5"/>
+            <TextBlock HorizontalAlignment="Left" Margin="243,70,0,0" TextWrapping="Wrap" Text="Frixel" VerticalAlignment="Top" FontSize="72" FontFamily="Agency FB" Height="101" Width="147"/>
+            <TextBlock HorizontalAlignment="Left" Margin="214,176,0,0" TextWrapping="Wrap" Text="Emil Poulsen &amp; Leland Jobson" VerticalAlignment="Top" Height="20" Width="186" TextAlignment="Center"/>
+            <TextBlock HorizontalAlignment="Left" Margin="218,208,0,0" TextWrapping="Wrap" Text="Developed at BeyondAEC18" VerticalAlignment="Top" Height="19" Width="176" FontSize="10" TextAlignment="Center"/>
+            <TextBlock HorizontalAlignment="Left" Margin="270,225,0,0" TextWrapping="Wrap" Text="07.21.2018" VerticalAlignment="Top" Height="20" Width="68" FontSize="10" TextAlignment="Center"/>
+        </Grid>
+        <Grid x:Name="grd_Message" HorizontalAlignment="Left" Height="47" Margin="182,25,0,0" Grid.Row="1" VerticalAlignment="Top" Width="215" Grid.ColumnSpan="2" Background="#E5FFE801" Visibility="Hidden">
+            <TextBlock Margin="11,11,10,9" TextWrapping="Wrap" Text="Modifying Topology" TextAlignment="Center" FontSize="16" FontWeight="Bold"/>
+        </Grid>
     </Grid>
 </Window>

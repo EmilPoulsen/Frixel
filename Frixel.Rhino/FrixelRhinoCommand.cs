@@ -211,6 +211,7 @@ namespace Frixel.Rhinoceros
                     foreach (var p in pixelList.Where(p => p.ContainsNode(myCoord,true)).ToList())
                     {
                         p.ChangeStateTo(PixelState.Moment);
+                        p.LockedBrace = true;
                         newPts.Add(nodeList[p.BottomLeft]);
                         newPts.Add(nodeList[p.TopLeft]);
                     }
@@ -263,8 +264,6 @@ namespace Frixel.Rhinoceros
                                                           plinePoints[i + 1].ToFrixelPoint())
                 );
             }
-
-
 
             // Return the data
             return new UI.FrixelReferenceData(pixelStruct, massingLines, Boundingbox);
@@ -358,7 +357,7 @@ namespace Frixel.Rhinoceros
             }
 
             // Show theFrixelWindow
-            _window.Show();
+            _window.ShowWindow();
 
             return Result.Success;
         }
