@@ -25,7 +25,7 @@ namespace Frixel.Core.Geometry
              );
         }
 
-        public void Scale(Domain2d from, Domain2d to)
+        public void Map(Domain2d from, Domain2d to)
         {
             // TODO TODO
         }
