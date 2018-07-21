@@ -38,6 +38,9 @@ namespace Frixel.UI
         public delegate FrixelReferenceData PixelStructurePass(double xSize, double ySize);
         public static event PixelStructurePass ReferenceFromRhino;
 
+        public delegate FrixelReferenceData PixelStructureUpdate(double xSize, double ySize);
+        public static event PixelStructureUpdate UpdateRhino;
+
 
         private double _xGridSize;
         private double _yGridSize;
@@ -93,19 +96,25 @@ namespace Frixel.UI
             var refData = ReferenceFromRhino(_xGridSize,_yGridSize);
             if(refData == null) { return; }
 
-            SetReferenceData(refData);
+            SetUpdated(refData);
             this.Redraw();
         }
 
         private void sld_GridX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             _xGridSize = GridSize(sld_GridX.Value);
+            var updated = UpdateRhino(_xGridSize, _yGridSize);
+            SetUpdated(updated);
+            this.Redraw();
             DrawGridSize();
         }
 
         private void sld_GridY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             _yGridSize = GridSize(sld_GridY.Value);
+            var updated = UpdateRhino(_xGridSize, _yGridSize);
+            SetUpdated(updated);
+            this.Redraw();
             DrawGridSize();
         }
 
@@ -122,7 +131,7 @@ namespace Frixel.UI
 
         #endregion
 
-        private void SetReferenceData(FrixelReferenceData refData)
+        private void SetUpdated(FrixelReferenceData refData)
         {
             this._pixelStructure = refData.Structure;
             this._actualMassingOutline = refData.ActualShape;
