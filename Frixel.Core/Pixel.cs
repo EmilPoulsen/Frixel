@@ -131,9 +131,8 @@ namespace Frixel.Core {
 
     public class NodeResult{
 
-        double DispX;
-        double DispY;
-    
+        public double DispX { get; set; }
+        public double DispY { get; set; }
     }
 
     public class ElementResult {
