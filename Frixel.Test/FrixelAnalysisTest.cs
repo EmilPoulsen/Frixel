@@ -4,6 +4,7 @@ using Frixel.Core;
 using Frixel.Core.Geometry;
 using System.Collections.Generic;
 using Frixel.Optimizer;
+using System.Diagnostics;
 
 namespace Frixel.Test {
     [TestClass]
@@ -37,6 +38,8 @@ namespace Frixel.Test {
             var results = frixArg.AnalysisResults;
             var fitness = frixArg.Fitness;
 
+
+            Trace.WriteLine(string.Format("Fitness: {0}", fitness));
 
         }
     }
