@@ -12,19 +12,13 @@ namespace Frixel.Test {
         public void AnalyzeFrixelFrame() {
 
             var pixelStructure = CreatePixelStructure();
-
-
+            
             FrixelAnalyzer analyzer = new FrixelAnalyzer();
 
             AnalysisResults results = analyzer.Analyze(pixelStructure);
-
             
-
         }
-
-
-
-
+        
         public PixelStructure CreatePixelStructure() {
 
             PixelStructure structure = new PixelStructure();
@@ -78,7 +72,7 @@ namespace Frixel.Test {
             structure.GravityLoad.Amplification = 1;
 
             structure.WindLoad.Activated = true;
-            structure.WindLoad.Direction = new Point2d(0, 70000000);
+            structure.WindLoad.Direction = new Point2d(70000000, 0);
 
             structure.WindLoad.NodeIndices.AddRange(new List<int>() {
                 0, 4, 8

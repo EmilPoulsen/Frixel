@@ -95,9 +95,9 @@ namespace Frixel.Optimizer
             }
 
             var wind = AddWindLoad(structure, model);
-            var grav = AddGravityLoad(structure, model);
+            //var grav = AddGravityLoad(structure, model);
 
-            var combined = CombineDict(wind, grav);
+            var combined = wind;//CombineDict(wind, grav);
 
             foreach (var pair in combined) {
 
