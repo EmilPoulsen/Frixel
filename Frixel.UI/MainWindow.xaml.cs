@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Frixel.Core;
@@ -72,12 +74,115 @@ namespace Frixel.UI
         public MainWindow()
         {
             InitializeComponent();
+            this.Opacity = 0;
+            this.grd_FrixelSplash.Visibility = Visibility.Visible;
+            this.grd_FrixelSplash.Opacity = 1;
             _sliderMappingDomains = new Tuple<Domain, Domain>(new Domain(0, 1), new Domain(SliderMin, SliderMax));
             _isRunning = false;
             _xGridSize = GridSize(sld_GridX.Value);
             _yGridSize = GridSize(sld_GridY.Value);
             _isRedrawing = false;
             DrawGridSize();
+        }
+
+        public void ShowWindow()
+        {
+            this.Opacity = 0;
+            this.Visibility = Visibility.Visible;
+            this.WindowFadeIn(this, 400);
+        }
+
+        private void ShowSplash()
+        {
+            this.grd_FrixelSplash.Visibility = Visibility.Visible;
+            this.SplashControlFade(this.grd_FrixelSplash, 400, 3);
+        }
+
+        private void ShowWarningMessage()
+        {
+            this.grd_Message.Visibility = Visibility.Visible;
+            this.grd_Message.Opacity = 1;
+            //this.ShowWarningMessageFade(this.grd_Message , 400);
+        }
+
+        private void HideWarningMessage()
+        {
+            this.HideWarningMessageFade(this.grd_Message, 1000, 3);
+        }
+
+        private void WindowFadeIn(FrameworkElement control, int speed = 300, int lingerTime = 2)
+        {
+            Storyboard storyboard = new Storyboard();
+            TimeSpan duration = new TimeSpan(0, 0, 0, 0, speed);
+            storyboard.Completed += Window_Completed_Fade; ;
+
+            var fadeInAnimation = new DoubleAnimation { From = 0, To = 1, Duration = new Duration(new TimeSpan(0, 0, 0, 0, 300)) };
+            fadeInAnimation.BeginTime = new TimeSpan(0, 0, 0);
+            Storyboard.SetTargetName(fadeInAnimation, control.Name);
+            Storyboard.SetTargetProperty(fadeInAnimation, new PropertyPath("Opacity", 0));
+            storyboard.Children.Add(fadeInAnimation);
+
+            storyboard.Begin(control);
+        }
+
+        private void ShowWarningMessageFade(FrameworkElement control, int speed = 300)
+        {
+            Storyboard storyboard = new Storyboard();
+            TimeSpan duration = new TimeSpan(0, 0, 0, 0, speed);
+
+            var fadeInAnimation = new DoubleAnimation { From = 0, To = 1, Duration = new Duration(new TimeSpan(0, 0, 0, 0, 300)) };
+            fadeInAnimation.BeginTime = new TimeSpan(0, 0, 0);
+            Storyboard.SetTargetName(fadeInAnimation, control.Name);
+            Storyboard.SetTargetProperty(fadeInAnimation, new PropertyPath("Opacity", 0));
+            storyboard.Children.Add(fadeInAnimation);
+
+            storyboard.Begin(control);
+        }
+
+        private void HideWarningMessageFade(FrameworkElement control, int speed = 300, int lingerTime = 2)
+        {
+            Storyboard storyboard = new Storyboard();
+            TimeSpan duration = new TimeSpan(0, 0, 0, 0, speed);
+            storyboard.Completed += WarningMessageCompleted; ; ;
+
+            var fadeOutAnimation = new DoubleAnimation { From = 1.0, To = 0, Duration = new Duration(duration) };
+            fadeOutAnimation.BeginTime = new TimeSpan(0, 0, lingerTime);
+            Storyboard.SetTargetName(fadeOutAnimation, control.Name);
+            Storyboard.SetTargetProperty(fadeOutAnimation, new PropertyPath("Opacity", 0));
+            storyboard.Children.Add(fadeOutAnimation);
+
+            storyboard.Begin(control);
+        }
+
+
+        private void WarningMessageCompleted(object sender, EventArgs e)
+        {
+            this.grd_Message.Visibility = Visibility.Hidden;
+        }
+
+        private void Window_Completed_Fade(object sender, EventArgs e)
+        {
+            ShowSplash();
+        }
+
+        private void SplashControlFade(FrameworkElement control, int speed = 300, int lingerTime = 2)
+        {
+            Storyboard storyboard = new Storyboard();
+            TimeSpan duration = new TimeSpan(0, 0, 0, 0, speed);
+            storyboard.Completed += Storyboard_Completed;
+
+            var fadeOutAnimation = new DoubleAnimation { From = 1.0, To = 0, Duration = new Duration(duration) };
+            fadeOutAnimation.BeginTime = new TimeSpan(0, 0, lingerTime);
+            Storyboard.SetTargetName(fadeOutAnimation, control.Name);
+            Storyboard.SetTargetProperty(fadeOutAnimation, new PropertyPath("Opacity", 0));
+            storyboard.Children.Add(fadeOutAnimation);
+
+            storyboard.Begin(control);
+        }
+
+        private void Storyboard_Completed(object sender, EventArgs e)
+        {
+            this.grd_FrixelSplash.Visibility = Visibility.Hidden;
         }
 
         private double GridSize(double sliderValue)
@@ -259,12 +364,12 @@ namespace Frixel.UI
         {
             // Set stuff
             _pixelStructure.GravityLoad.Activated = true;
-            _pixelStructure.GravityLoad.Amplification = 10000;
+            _pixelStructure.GravityLoad.Amplification = 5000;
 
             if (this.sld_WindLoad.Value != null)
             {
                 _pixelStructure.WindLoad.Activated = true;
-                _pixelStructure.WindLoad.Direction = new Point2d(1000000 * sld_WindLoad.Value, 0);
+                _pixelStructure.WindLoad.Direction = new Point2d(500000 * sld_WindLoad.Value, 0);
                 _pixelStructure.WindLoad.NodeIndices = _pixelStructure.Nodes.Select(n => _pixelStructure.Nodes.IndexOf(n)).ToList();
             }
 
@@ -276,7 +381,27 @@ namespace Frixel.UI
                 Redisplace();
                 Redraw(true);
             }
-            catch (Exception asd) { this._analysisResults = null; Redraw(); MessageBox.Show(asd.Message); }
+            catch (Exception asd)
+            {
+                // Show warning message
+                ShowWarningMessage();
+                Thread.Sleep(2000);
+
+                try
+                {
+                    BraceAll();
+                    var anal = new Optimizer.FrixelAnalyzer();
+                    this._analysisResults = anal.Analyze(_pixelStructure);
+                    Redisplace();
+                    Redraw(true);
+                }
+                catch (Exception fuckit)
+                {
+                    this._analysisResults = null; Redraw(); //MessageBox.Show(asd.Message); }
+
+                }
+                HideWarningMessage();
+            }
         }
 
         private void Redisplace()
@@ -301,6 +426,11 @@ namespace Frixel.UI
         }
 
         private void btn_BraceAll_Click(object sender, RoutedEventArgs e)
+        {
+            BraceAll();
+        }
+
+        private void BraceAll()
         {
             this._pixelStructure.Pixels.ForEach(p => p.ChangeStateTo(PixelState.Moment));
             Redraw();
