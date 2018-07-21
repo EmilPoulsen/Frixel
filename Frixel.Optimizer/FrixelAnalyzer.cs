@@ -16,7 +16,7 @@ namespace Frixel.Optimizer
             
         }
         
-        public AnalysisResults Analyze(PixelStructure pixelStructure) {
+        public _analysisResults Analyze(PixelStructure pixelStructure) {
 
             var model = BuildModel(pixelStructure);
 
@@ -25,12 +25,12 @@ namespace Frixel.Optimizer
             return results;
         }
 
-        public AnalysisResults AnalyzeModel(FiniteElementModel model) {
+        public _analysisResults AnalyzeModel(FiniteElementModel model) {
 
             IFiniteElementSolver solver = new MatrixInversionLinearSolver(model);
             FiniteElementResults results = solver.Solve();
 
-            AnalysisResults pixResults = new AnalysisResults();
+            _analysisResults pixResults = new _analysisResults();
 
             int i = 0;
             foreach (var node in model.Nodes) {
