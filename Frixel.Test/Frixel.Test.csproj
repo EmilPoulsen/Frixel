@@ -93,6 +93,10 @@
       <Project>{02D6340D-35CB-488C-BD0A-269D0A9B184D}</Project>
       <Name>Frixel.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Frixel.Optimizer\Frixel.Optimizer.csproj">
+      <Project>{5f199cfd-b7c4-4c36-b7be-85387c684348}</Project>
+      <Name>Frixel.Optimizer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

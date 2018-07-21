@@ -10,15 +10,14 @@ namespace Frixel.Optimizer
 {
     public class FrixelAnalyzer
     {
-        private PixelStructure _pixelStructure;
-
-        public FrixelAnalyzer(PixelStructure pixelStructure) {
-            _pixelStructure = pixelStructure;
+        
+        public FrixelAnalyzer() {
+            
         }
         
-        public AnalysisResults Analyze() {
+        public AnalysisResults Analyze(PixelStructure pixelStructure) {
 
-            var model = BuildModel(_pixelStructure);
+            var model = BuildModel(pixelStructure);
 
             var results = AnalyzeModel(model);
 
@@ -124,8 +123,5 @@ namespace Frixel.Optimizer
             }
 
         }
-
-         
-        
     }
 }

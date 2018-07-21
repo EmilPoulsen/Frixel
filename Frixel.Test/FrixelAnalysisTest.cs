@@ -3,12 +3,23 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Frixel.Core;
 using Frixel.Core.Geometry;
 using System.Collections.Generic;
+using Frixel.Optimizer;
 
 namespace Frixel.Test {
     [TestClass]
     public class FrixelAnalysisTest {
         [TestMethod]
         public void AnalyzeFrixelFrame() {
+
+            var pixelStructure = CreatePixelStructure();
+
+
+            FrixelAnalyzer analyzer = new FrixelAnalyzer();
+
+            AnalysisResults results = analyzer.Analyze(pixelStructure);
+
+            
+
         }
 
 
@@ -38,6 +49,12 @@ namespace Frixel.Test {
                 new Point2d(9, 6),
             });
 
+            //add supports
+            for (int i = 0; i < 4; i++) {
+                structure.Nodes[i].IsLocked = true;
+            }
+
+            //add bracing elements
             structure.Edges.AddRange(new List<Edge>() {
                 //horizontal elements
                 new Edge(0, 1), new Edge(1, 2), new Edge(2, 3),
@@ -50,11 +67,24 @@ namespace Frixel.Test {
                 new Edge(3, 7), new Edge(7, 11),
             });
 
+            //add the bracing
+            structure.Pixels.AddRange(new List<Pixel>() {
+                new Pixel(5, 6, 1, 2, PixelState.Moment),
+                new Pixel(9, 10, 5, 6, PixelState.Moment)
+            });
+
+            //add load
+            structure.GravityLoad.Activated = true;
+            structure.GravityLoad.Amplification = 1;
+
+            structure.WindLoad.Activated = true;
+            structure.WindLoad.Direction = new Point2d(0, 70000000);
+
+            structure.WindLoad.NodeIndices.AddRange(new List<int>() {
+                0, 4, 8
+            });
+
             return structure;
-
-
-
-
         }
     }
 }
