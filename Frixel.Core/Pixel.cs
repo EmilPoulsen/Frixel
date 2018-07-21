@@ -140,6 +140,34 @@ namespace Frixel.Core {
         public Point2d Direction { get; set; }
     }
 
+    public class NodeResult{
+
+        public double DispX { get; set; }
+        public double DispY { get; set; }
+    }
+
+    public class ElementResult {
+        double AxialForce { get; set; }
+    }
+
+    public class PixelResult {
+        double LeftRight { get; set; }
+        double RightLeft { get; set; }
+        
+    }
+
+    public class AnalysisResults {
+
+        public AnalysisResults() {
+            this.NodeResults = new Dictionary<int, NodeResult>();
+        }
+
+        public Dictionary<int, NodeResult> NodeResults;
+        public Dictionary<int, ElementResult> ElementResults;
+        public Dictionary<int, PixelResult> PixelResults;
+        
+    }
+
     public enum PixelState
     {
         None,
