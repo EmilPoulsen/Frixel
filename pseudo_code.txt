@@ -1,0 +1,36 @@
+frixel.core - IO objects
+
+frixel.ui - UI logic
+
+frixel.optimizer - sharpFE/genetic sharpt
+
+
+frixel.rhino - rhino plugin
+
+
+
+//////////////
+
+FeModel model
+
+foreach node in structure.nodes
+	model.AddNode(node.ToFeNode());
+end foreach
+
+foreach edge in structure.edges
+	int s = edge.Start;
+	int e = edge.End;
+	model.AddTrussByIndex(s,e);
+end foreach
+
+FeModel baseModel = model.Clone();
+
+foreach pixel in structure.pixel
+	List<Edge> braces = pixel.GetBracing();
+	foreach brace in braces
+		int s = brace.Start;
+		int e = brace.End;
+		model.AddTrussByIndex(s,e)
+	end foreach
+end foreach
+	
