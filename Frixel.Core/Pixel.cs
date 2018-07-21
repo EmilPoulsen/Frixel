@@ -217,15 +217,21 @@ namespace Frixel.Core {
     }
 
     public class PixelResult {
+
+        public bool IsBraced { get; set; }
+
         double LeftRight { get; set; }
         double RightLeft { get; set; }
         
+
+
     }
 
     public class AnalysisResults {
 
         public AnalysisResults() {
             this.NodeResults = new Dictionary<int, NodeResult>();
+            this.PixelResults = new Dictionary<int, PixelResult>();
         }
 
         public Dictionary<int, NodeResult> NodeResults;

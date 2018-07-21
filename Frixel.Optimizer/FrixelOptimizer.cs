@@ -18,8 +18,8 @@ using GeneticSharp.Domain.Randomizations;
 namespace Frixel.Optimizer {
 
 
-    public class FrixelOptimizer{
-        
+    public class FrixelOptimizer {
+
         public FrixelOptimizer() {
 
         }
@@ -35,7 +35,7 @@ namespace Frixel.Optimizer {
 
             var selection = new EliteSelection();
             var crossover = new UniformCrossover(0.5f);
-            var mutation = new FlipBitMutation();
+            var mutation = new UniformMutation(); //FlipBitMutation();
             var termination = new FitnessStagnationTermination(100);
 
             var ga = new GeneticAlgorithm(
@@ -52,13 +52,20 @@ namespace Frixel.Optimizer {
             ga.Start();
 
             return null;
-            
+
         }
 
         private void GenerationRan(object sender, EventArgs e) {
 
-            string s = "";
+            GeneticAlgorithm ga = sender as GeneticAlgorithm;
+
+            var structFitness = ga.Fitness as StructuralFitness;
+
             
+            var results = structFitness.LatestResults;
+
+            string s = "";
+
             //throw new NotImplementedException();
         }
     }
@@ -69,7 +76,7 @@ namespace Frixel.Optimizer {
 
         }
         public bool Switch { get; set; }
-        
+
         public int PixIndex { get; set; }
     }
 
@@ -93,7 +100,7 @@ namespace Frixel.Optimizer {
 
                 bool s = rand.Next(0, 2) == 0;
 
-                    piswi.Switch = s;
+                piswi.Switch = s;
                 ReplaceGene(i, new Gene(piswi));
             }
 
@@ -114,6 +121,10 @@ namespace Frixel.Optimizer {
         public override IChromosome CreateNew() {
             return new MyProblemChromosome(_numPixels);
         }
+
+        //public void FlipGene(int index) {
+        //    //throw new NotImplementedException();
+        //}
     }
 
     public class StructuralFitness : IFitness {
@@ -134,7 +145,7 @@ namespace Frixel.Optimizer {
             FrixelAnalyzer frixAnalyzer = new FrixelAnalyzer();
 
             var model = frixAnalyzer.BuildModel(_structure);
-            
+
             var genes = chromosome.GetGenes();
 
             int i = 0;
@@ -142,7 +153,7 @@ namespace Frixel.Optimizer {
                 var pixswi = g.Value as PixSwitch;
 
                 var pixel = _structure.Pixels[i];
-                
+
                 if (!pixel.LockedBrace) {
 
                     if (pixswi.Switch) {
@@ -163,6 +174,24 @@ namespace Frixel.Optimizer {
             }
             var results = frixAnalyzer.AnalyzeModel(model);
 
+            i = 0;
+            foreach (var g in genes) {
+                var pixswi = g.Value as PixSwitch;
+                var pixel = _structure.Pixels[i];
+                PixelResult pixResult = new PixelResult();
+
+                if (pixel.LockedBrace) {
+                    pixResult.IsBraced = true;
+                }
+                else {
+                    pixResult.IsBraced = pixswi.Switch;
+                }
+
+                results.PixelResults.Add(i, pixResult);
+                i++;
+            }
+            
+            this.LatestResults = results;
             double max = double.MinValue;
 
             foreach (var pair in results.NodeResults) {
@@ -170,15 +199,19 @@ namespace Frixel.Optimizer {
 
                 double dist = Math.Sqrt(Math.Pow(res.DispX, 2) + Math.Pow(res.DispY, 2));
 
-                if(dist > max) {
+                if (dist > max) {
                     max = dist;
                 }
             }
+            this.CurrentFitness = max;
 
             //double weight = CalcWeight(model);
             return max;
         }
-        
+
+        public AnalysisResults LatestResults { get; set; }
+        public double CurrentFitness { get; private set; }
+
         public double CalcWeight(FiniteElementModel model) {
             double tot = 0;
 
