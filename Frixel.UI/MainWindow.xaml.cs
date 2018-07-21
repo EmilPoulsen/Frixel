@@ -54,7 +54,7 @@ namespace Frixel.UI
         private List<Line2d> _actualMassingOutline;
         private Domain2d _massingDomain;
 
-        private _analysisResults _analysisResults;
+        private AnalysisResults _analysisResults;
         private double _windLoad;
         private List<double> _dispMap = new List<double>();
 

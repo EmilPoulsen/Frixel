@@ -18,6 +18,16 @@ namespace Frixel.Test {
             AnalysisResults results = analyzer.Analyze(pixelStructure);
             
         }
-        
+
+        [TestMethod]
+        public void OptimizePixStruct() {
+
+            var pixelStructure = ModelCreator.CreatePixelStructure();
+
+            FrixelOptimizer optimizer = new FrixelOptimizer();
+
+            optimizer.Optimize(pixelStructure);
+        }
+
     }
 }
