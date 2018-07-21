@@ -44,7 +44,7 @@ namespace Frixel.Optimizer {
 
             var chromosome = new MyProblemChromosome(structure.Pixels.Count);
 
-            var population = new Population(50, 100, chromosome);
+            var population = new Population(5, 10, chromosome);
 
             var fitness = new StructuralFitness(structure);
 
@@ -132,12 +132,14 @@ namespace Frixel.Optimizer {
         }
 
         public override Gene GenerateGene(int geneIndex) {
-            // Generate a gene base on my problem chromosome representation.
-            //return new Gene(RandomizationProvider.Current.GetInt(0, _numPixels));
+            
+            Random rand = new Random();
+
 
             PixSwitch piswi = new PixSwitch();
-            int s = RandomizationProvider.Current.GetInt(0, 1);
-            piswi.Switch = false;//s == 0 ? false : true;
+            bool s = rand.Next(0, 2) == 0;
+
+            piswi.Switch = s;//s == 0 ? false : true;
 
             return new Gene(piswi);
 
@@ -236,7 +238,7 @@ namespace Frixel.Optimizer {
             this.CurrentFitness = max;
 
             //double weight = CalcWeight(model);
-            return max;
+            return 1/max;
         }
 
         public AnalysisResults LatestResults { get; set; }
