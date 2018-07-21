@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Frixel.Core;
 using Frixel.Core.Extensions;
+using Frixel.Core.Geometry;
 
 namespace Frixel.UI
 {
@@ -21,14 +22,25 @@ namespace Frixel.UI
     /// </summary>
     public partial class MainWindow : Window
     {
-        const double SliderMin = 1;
+        /// <summary>
+        /// Real world value of our sliders min (m)
+        /// </summary>
+        const double SliderMin = 5;
+        /// <summary>
+        /// Real world value of our sliders max (m)
+        /// </summary>
         const double SliderMax = 30;
-        const double CanvasScaleFactor = .8;
+        /// <summary>
+        /// Margin of canvas in pixels
+        /// </summary>
+        const double CanvasMargin = 20; 
 
         private double _xGridSize;
         private double _yGridSize;
         private bool _isRunning;
+        private bool _isRedrawing;
         private Tuple<Domain, Domain> _sliderMappingDomains;
+        private PixelStructure _pixelStructure;
 
 
         public MainWindow()
@@ -38,6 +50,7 @@ namespace Frixel.UI
             _isRunning = false;
             _xGridSize = GridSize(sld_GridX.Value);
             _yGridSize = GridSize(sld_GridY.Value);
+            _isRedrawing = false;
             DrawGridSize();
         }
 
@@ -74,22 +87,49 @@ namespace Frixel.UI
 
         private void Redraw()
         {
+            // Set state
+            this._isRedrawing = true;
+
+            // Clear canvas
+            ClearCanvas();
+
+            // If canvas is too small fuck off
+            if (CanvasIsSmall()) { this._isRedrawing = false; return; }
+
             // Get canvas properties
             var canvasWidth = this.canv_Main.ActualWidth;
             var canvasHeight = this.canv_Main.ActualHeight;
 
             // Get domain of our collection of points in x and Y
-            // TODO TODO TODO
+            Domain2d pxlSDomain = _pixelStructure.Nodes.GetBoundingBox();
 
-            // Scale our lines using the domain
+            // Get canvas ready lines
+            var canvasDomain = new Domain2d(
+                new Domain(0 + CanvasMargin, canvasWidth - CanvasMargin),
+                new Domain(0 + CanvasMargin, canvasHeight - CanvasMargin)
+                );
 
+            List<Line> linesToDraw = _pixelStructure.GetLines().Select(l =>
+            {
+                return l.Map(pxlSDomain, canvasDomain).ToCanvasLine();
+            }).ToList();
 
-            // Draw a bunch of lines from rhino
-            var lin = new Line();
-            lin.X
+            // Add lines to canvas 
+            linesToDraw.ForEach(l => canv_Main.Children.Add(l));
+
+            this._isRedrawing = false;
         }
 
-        private void 
+        private bool CanvasIsSmall()
+        {
+            return (this.canv_Main.ActualWidth < CanvasMargin * 4
+               | this.canv_Main.ActualHeight < CanvasMargin * 4);
+        }
+
+        private void ClearCanvas()
+        {
+            this.canv_Main.Children.Clear();
+        }
 
         #endregion
 
