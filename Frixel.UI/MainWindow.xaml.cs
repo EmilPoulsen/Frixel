@@ -69,6 +69,7 @@ namespace Frixel.UI
             _isRedrawing = false;
             DrawGridSize();
             Redraw();
+            Subscribe();
         }
 
         public MainWindow()
@@ -83,6 +84,23 @@ namespace Frixel.UI
             _yGridSize = GridSize(sld_GridY.Value);
             _isRedrawing = false;
             DrawGridSize();
+            Subscribe();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            Unsubscribe();
+        }
+
+        private void Subscribe()
+        {
+
+        }
+
+        private void Unsubscribe()
+        {
+
         }
 
         public void ShowWindow()
@@ -434,6 +452,21 @@ namespace Frixel.UI
         {
             this._pixelStructure.Pixels.ForEach(p => p.ChangeStateTo(PixelState.Moment));
             Redraw();
+        }
+
+        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
+
+        private void tb_Close_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void btn_Optimize_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
 
