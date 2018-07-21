@@ -26,8 +26,18 @@ namespace Frixel.Test {
 
             FrixelOptimizer optimizer = new FrixelOptimizer();
 
+            optimizer.RanIteration += Optimizer_RanIteration;
+
             optimizer.Optimize(pixelStructure);
         }
 
+        private void Optimizer_RanIteration(object sender, EventArgs e) {
+
+            var frixArg = e as FrixelEventArgs;
+            var results = frixArg.AnalysisResults;
+            var fitness = frixArg.Fitness;
+
+
+        }
     }
 }
