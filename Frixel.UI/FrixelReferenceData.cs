@@ -15,11 +15,13 @@ namespace Frixel.UI
     {
         public PixelStructure Structure;
         public List<Line2d> ActualShape;
+        public Domain2d BoundingBox;
 
-        public FrixelReferenceData(PixelStructure structure, List<Line2d> actualShape)
+        public FrixelReferenceData(PixelStructure structure, List<Line2d> actualShape, Domain2d boundingBox)
         {
             this.Structure = structure;
             this.ActualShape = actualShape;
+            this.BoundingBox = boundingBox;
         } 
     }
 }

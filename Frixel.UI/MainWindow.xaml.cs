@@ -47,6 +47,7 @@ namespace Frixel.UI
 
         private PixelStructure _pixelStructure;
         private List<Line2d> _actualMassingOutline;
+        private Domain2d _massingDomain;
 
 
         public MainWindow(PixelStructure pixelStructure)
@@ -125,13 +126,11 @@ namespace Frixel.UI
         {
             this._pixelStructure = refData.Structure;
             this._actualMassingOutline = refData.ActualShape;
+            this._massingDomain = refData.BoundingBox;
         }
 
         private void Redraw()
         {
-            // Reasons to fuck off
-            if (CanvasIsSmall()) { return; }
-            if (this._pixelStructure == null | this._actualMassingOutline == null) { return; }
 
             // Set state
             this._isRedrawing = true;
@@ -139,12 +138,17 @@ namespace Frixel.UI
             // Clear canvas
             ClearCanvas();
 
+            // If canvas is too small fuck off
+            if (CanvasIsSmall()) { return; }
+            if (this._pixelStructure == null | this._actualMassingOutline == null) { return; }
+
             // Get canvas properties
             var canvasWidth = this.canv_Main.ActualWidth;
             var canvasHeight = this.canv_Main.ActualHeight; // Test height
 
             // Get domain of our collection of points in x and Y
-            Domain2d pxlSDomain = _pixelStructure.Nodes.GetBoundingBox();
+            //Domain2d pxlSDomain = _pixelStructure.Nodes.GetBoundingBox();
+            Domain2d pxlSDomain = this._massingDomain;
 
             // Get canvas ready lines
             var canvasDomain = new Domain2d(
