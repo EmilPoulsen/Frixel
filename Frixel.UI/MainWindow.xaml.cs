@@ -178,11 +178,11 @@ namespace Frixel.UI
 
             List<Line> pxsLines = _pixelStructure.GetAllLInes().Select(l =>
             {
-                return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Black);
+                return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Gray);
             }).ToList();
             List<Line> actualMassingLInes = _actualMassingOutline.Select(l =>
             {
-                return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Red);
+                return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.LightBlue);
             }).ToList();
 
             // Add lines to canvas 

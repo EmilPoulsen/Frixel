@@ -182,7 +182,7 @@ namespace Frixel.Rhinoceros
             var coord = nodeDictionary.Where(x => x.Value == closestNode).First().Key;
 
             // Find orientation of spine curve, vert or horz, to create spine
-            bool xDir = _spine.Item1.X - _spine.Item1.X > _spine.Item1.Y - _spine.Item1.Y;
+            bool xDir = Math.Abs(_spine.Item1.X - _spine.Item2.X) > Math.Abs(_spine.Item1.Y - _spine.Item2.Y);
             if (xDir)
             {
                 var horzPts = nodeDictionary.Where(x => x.Key.Item2 == coord.Item2).ToList().Select(x => x.Value);
