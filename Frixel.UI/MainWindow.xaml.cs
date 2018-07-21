@@ -219,6 +219,12 @@ namespace Frixel.UI
             Redraw();
         }
 
+        private void btn_Run_Click(object sender, RoutedEventArgs e)
+        {
+            // Run an analysis
+
+        }
+
 
         // Pseudocode
         // 1 Reference geometry - Anytime

@@ -50,7 +50,7 @@
                 <ColumnDefinition Width="71*"/>
                 <ColumnDefinition Width="64*"/>
             </Grid.ColumnDefinitions>
-            <Button x:Name="btn_Run" Content="Run" Margin="0,0,1,6" Grid.RowSpan="2" Background="#FFEDFFBD"/>
+            <Button x:Name="btn_Run" Content="Run" Margin="0,0,1,6" Grid.RowSpan="2" Background="#FFEDFFBD" Click="btn_Run_Click"/>
             <Button x:Name="btn_Reset" Content="Reset" Margin="1,0,0,1" Grid.Column="1" Background="#FFF1F1F1"/>
             <Button x:Name="btn_Save" Content="Save" Margin="1,1,0,6" Grid.Column="1" Grid.Row="1" Background="#FFE7EED7"/>
         </Grid>
