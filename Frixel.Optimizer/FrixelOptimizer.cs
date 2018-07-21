@@ -181,6 +181,12 @@ namespace Frixel.Optimizer {
 
                 var pixel = _structure.Pixels[i];
 
+                //// HACK //////
+                Random rand = new Random();
+                bool lol = rand.Next(0, 2) == 0;
+                pixswi.Switch = lol;
+                ///// HACK //////
+
                 if (!pixel.LockedBrace) {
 
                     if (pixswi.Switch) {
@@ -210,6 +216,8 @@ namespace Frixel.Optimizer {
                 var pixel = _structure.Pixels[i];
                 PixelResult pixResult = new PixelResult();
 
+
+
                 if (pixel.LockedBrace) {
                     pixResult.IsBraced = true;
                 }
@@ -238,7 +246,7 @@ namespace Frixel.Optimizer {
             this.CurrentFitness = max;
 
             //double weight = CalcWeight(model);
-            return 1/max;
+            return max;
         }
 
         public AnalysisResults LatestResults { get; set; }
