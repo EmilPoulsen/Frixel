@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Rhino;
 using Rhino.Commands;
+using Rhino.DocObjects;
 using Rhino.Geometry;
 using Rhino.Input;
 using Rhino.Input.Custom;
@@ -15,6 +17,21 @@ namespace Frixel.Rhinoceros
             // Rhino only creates one instance of each command class defined in a
             // plug-in, so it is safe to store a refence in a static property.
             Instance = this;
+            Frixel.UI.MainWindow.ReferenceFromRhino += MainWindow_ReferenceFromRhino;
+        }
+
+        private UI.FrixelReferenceData MainWindow_ReferenceFromRhino(double xSize, double ySize)
+        {
+            // Tell user to select objects from doc
+            var go = new GetObject();
+            go.SetCommandPrompt("Select a closed curve");
+            go.GeometryFilter = ObjectType.Curve;
+            go.GeometryAttributeFilter = GeometryAttributeFilter.ClosedCurve;
+            var curves = go.Objects().Select(o => o.Curve());
+            if (curves.Count() == 0) { return null; }
+            var curve = curves.First();
+
+            // Bring the curve into our interface
         }
 
         ///<summary>The only instance of this command.</summary>
