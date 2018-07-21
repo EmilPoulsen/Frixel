@@ -16,13 +16,35 @@ namespace Frixel.Optimizer
             _pixelStructure = pixelStructure;
         }
         
-        public PixelStructure Analyze() {
+        public AnalysisResults Analyze() {
 
             var model = BuildModel(_pixelStructure);
 
+            var results = AnalyzeModel(model);
 
+            return results;
+        }
 
-            return null;
+        public AnalysisResults AnalyzeModel(FiniteElementModel model) {
+
+            IFiniteElementSolver solver = new MatrixInversionLinearSolver(model);
+            FiniteElementResults results = solver.Solve();
+
+            AnalysisResults pixResults = new AnalysisResults();
+
+            int i = 0;
+            foreach (var node in model.Nodes) {
+
+                var disp = results.GetDisplacement(node);
+
+                pixResults.NodeResults.Add(i, new NodeResult() {
+                    DispX = disp.X,
+                    DispY = disp.Y
+                });
+            }
+
+            return pixResults;
+            
         }
 
 
