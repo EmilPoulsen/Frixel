@@ -189,6 +189,16 @@ namespace Frixel.UI
             pxsLines.ForEach(l => canv_Main.Children.Add(l));
             actualMassingLInes.ForEach(l => canv_Main.Children.Add(l));
 
+            // Render support points
+            List<Rectangle> supports = _pixelStructure.Nodes.Where(n => n.IsLocked).ToList().Select(n =>
+            {
+                return n.Map(pxlSDomain, canvasDomain).ToCanvasRect(20, Brushes.Blue);
+            }).ToList();
+            supports.ForEach(r =>
+            {
+                int index = canv_Main.Children.Add(r);
+            });
+
             // Set state
             this._isRedrawing = false;
         }

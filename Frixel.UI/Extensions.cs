@@ -20,5 +20,20 @@ namespace Frixel.UI
             windowsLine.StrokeThickness = thickness;
             return windowsLine;
         }
+
+        public static System.Windows.Shapes.Rectangle ToCanvasRect(this Point2d point, double size, M.Brush color, double thickness = 2)
+        {
+            var windowsRect = new System.Windows.Shapes.Rectangle();
+            windowsRect.Width = size;
+            windowsRect.Height = size;
+            windowsRect.Stroke = color;
+            windowsRect.Fill = new M.SolidColorBrush(M.Color.FromArgb(0, 0, 0, 0));
+            windowsRect.Margin = new System.Windows.Thickness(
+                point.X - size / 2,
+                point.Y - size / 2,
+                0, 0);
+            windowsRect.StrokeThickness = thickness;
+            return windowsRect;
+        }
     }
 }
