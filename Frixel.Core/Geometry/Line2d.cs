@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Frixel.Core.Extensions;
 
 namespace Frixel.Core.Geometry
 {
@@ -25,9 +26,14 @@ namespace Frixel.Core.Geometry
              );
         }
 
-        public void Map(Domain2d from, Domain2d to)
+        public Line2d Map(Domain2d from, Domain2d to)
         {
-            // TODO TODO
+            return new Line2d(
+                new Point2d(this.Start.X.Map(from.X, to.X),
+                            this.Start.Y.Map(from.Y, to.Y)),
+                new Point2d(this.End.X.Map(from.X, to.X),
+                            this.End.Y.Map(from.Y, to.Y))
+            );
         }
     }
 }
