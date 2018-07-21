@@ -8,7 +8,7 @@
         Title="Frixel" Height="337.5" Width="613.5" SizeChanged="Window_SizeChanged" ResizeMode="CanResizeWithGrip" x:Name="windowMain" AllowsTransparency="True" WindowStyle="None">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="26*"/>
+            <RowDefinition Height="26"/>
             <RowDefinition Height="106*"/>
             <RowDefinition Height="119*"/>
             <RowDefinition Height="87*"/>
@@ -114,7 +114,7 @@
             </Grid.Background>
             <TextBlock HorizontalAlignment="Left" Margin="6,2,0,3" TextWrapping="Wrap" Text="Frixel" Width="31" Foreground="White"/>
             <TextBlock x:Name="tb_Close" HorizontalAlignment="Left" Margin="602,0,0,5" TextWrapping="Wrap" Text="x" Width="9" Foreground="White" MouseDown="tb_Close_MouseDown"/>
+            <TextBlock x:Name="tb_Generations" TextWrapping="Wrap" Margin="42,4,250,0" Foreground="#99FFFFFF" FontSize="9" Text="completes 9 generations"/>
         </Grid>
-        <TextBlock x:Name="tb_Generations" TextWrapping="Wrap" Margin="5,0,3,89" Height="16" VerticalAlignment="Bottom" Grid.Row="1" Foreground="Red" FontSize="10"/>
     </Grid>
 </Window>
