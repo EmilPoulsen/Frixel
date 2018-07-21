@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SharpFE;
+using SharpFE.Geometry;
 
 namespace Frixel.Optimizer
 {
@@ -50,7 +51,32 @@ namespace Frixel.Optimizer
             }
 
             return pixResults;
+            foreach (var elem in model.Elements) {
+
+                if(elem is LinearTruss) {
+                    var truss = elem as LinearTruss;
+                    var startLoc = truss.StartNode.Location;
+                    var endLoc = truss.EndNode.Location;
+
+                    
+                    //double dist = 
+
+
+                }
+
+                
+
+
+            }
+
             
+        }
+
+        public double Distance(CartesianPoint p1, CartesianPoint p2) {
+            double lengthX = p2.X - p1.X;
+            double lengthY = p2.Y - p1.Y;
+            double lengthZ = p2.Z - p1.Z;
+            return Math.Sqrt((lengthX * lengthX) + (lengthY * lengthY) + (lengthZ * lengthZ));
         }
 
 
