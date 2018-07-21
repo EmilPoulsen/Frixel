@@ -19,16 +19,46 @@ namespace Frixel.Optimizer {
 
 
     public class FrixelOptimizer{
-
+        
         public FrixelOptimizer() {
 
         }
 
 
-        
+        public void Optimize(PixelStructure structure) {
 
+            var chromosome = new MyProblemChromosome(structure.Pixels.Count);
 
+            var population = new Population(50, 100, chromosome);
 
+            var fitness = new StructuralFitness(structure);
+
+            var selection = new EliteSelection();
+            var crossover = new UniformCrossover(0.5f);
+            var mutation = new FlipBitMutation();
+            var termination = new FitnessStagnationTermination(100);
+
+            var ga = new GeneticAlgorithm(
+                population,
+                fitness,
+                selection,
+                crossover,
+                mutation);
+
+            ga.Termination = termination;
+
+            ga.GenerationRan += GenerationRan;
+
+            ga.Start();
+            
+        }
+
+        private void GenerationRan(object sender, EventArgs e) {
+
+            string s = "";
+            
+            //throw new NotImplementedException();
+        }
     }
 
 
@@ -84,7 +114,7 @@ namespace Frixel.Optimizer {
         PixelStructure _structure;
 
 
-        public StructuralFitness(FiniteElementModel model, PixelStructure structure) {
+        public StructuralFitness(PixelStructure structure) {
             //_model = model;
             _structure = structure;
         }
@@ -105,19 +135,21 @@ namespace Frixel.Optimizer {
                 var pixswi = g.Value as PixSwitch;
 
                 var pixel = _structure.Pixels[i];
-
-
+                
                 if (!pixel.LockedBrace) {
 
-                    var bracing = pixel.GetBracing();
-                    foreach (var brace in bracing) {
-                        int s = brace.Start;
-                        int e = brace.End;
+                    if (pixswi.Switch) {
 
-                        var sNode = model.Nodes.ElementAt(s);
-                        var eNode = model.Nodes.ElementAt(e);
+                        var bracing = pixel.GetBracing();
+                        foreach (var brace in bracing) {
+                            int s = brace.Start;
+                            int e = brace.End;
 
-                        model.ElementFactory.CreateLinearTruss(sNode, eNode, _material, _section);
+                            var sNode = model.Nodes.ElementAt(s);
+                            var eNode = model.Nodes.ElementAt(e);
+
+                            model.ElementFactory.CreateLinearTruss(sNode, eNode, _material, _section);
+                        }
                     }
                 }
             }
@@ -136,7 +168,6 @@ namespace Frixel.Optimizer {
             }
 
             //double weight = CalcWeight(model);
-            
             return max;
         }
         
