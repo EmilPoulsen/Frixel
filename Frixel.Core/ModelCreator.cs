@@ -52,8 +52,12 @@ namespace Frixel.Core {
 
             //add the bracing
             structure.Pixels.AddRange(new List<Pixel>() {
-                new Pixel(5, 6, 1, 2, PixelState.Moment),
-                new Pixel(9, 10, 5, 6, PixelState.Moment)
+                new Pixel(4, 5, 0, 1, PixelState.None),
+                new Pixel(5, 6, 1, 2, PixelState.Moment) { LockedBrace = true },
+                new Pixel(6, 7, 2, 3, PixelState.None),
+                new Pixel(8, 9, 4, 5, PixelState.None),
+                new Pixel(9, 10, 5, 6, PixelState.Moment) { LockedBrace = true },
+                new Pixel(10, 11, 6, 7, PixelState.None)
             });
 
             //add load

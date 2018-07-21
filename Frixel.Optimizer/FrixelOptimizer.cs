@@ -25,7 +25,7 @@ namespace Frixel.Optimizer {
         }
 
 
-        public void Optimize(PixelStructure structure) {
+        public AnalysisResults Optimize(PixelStructure structure) {
 
             var chromosome = new MyProblemChromosome(structure.Pixels.Count);
 
@@ -50,6 +50,8 @@ namespace Frixel.Optimizer {
             ga.GenerationRan += GenerationRan;
 
             ga.Start();
+
+            return null;
             
         }
 
