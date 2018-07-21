@@ -50,6 +50,8 @@ namespace Frixel.Core {
             return edgeList;
         }
 
+        public bool LockedBrace { get; set; }
+
         public bool ContainsNode(int nodeIndex, bool oneSideOnly = false)
         {
             if (oneSideOnly)
