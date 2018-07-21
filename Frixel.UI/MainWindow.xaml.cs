@@ -79,6 +79,8 @@ namespace Frixel.UI
         private void btn_RefGeo_Click(object sender, RoutedEventArgs e)
         {
             var refData = ReferenceFromRhino(_xGridSize,_yGridSize);
+            if(refData == null) { return; }
+
             SetReferenceData(refData);
             this.Redraw();
         }

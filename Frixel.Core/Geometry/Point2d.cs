@@ -9,6 +9,7 @@ namespace Frixel.Core.Geometry
     public class Point2d
     {
         public bool IsLocked;
+        public bool IsInside;
         public double X;
         public double Y;
 

@@ -7,6 +7,7 @@ using Rhino.DocObjects;
 using Rhino.Geometry;
 using Rhino.Input;
 using Rhino.Input.Custom;
+using Frixel.Rhinoceros.Extensions;
 
 namespace Frixel.Rhinoceros
 {
@@ -31,7 +32,64 @@ namespace Frixel.Rhinoceros
             if (curves.Count() == 0) { return null; }
             var curve = curves.First();
 
-            // Bring the curve into our interface
+            // Create a mesh from the closed curve
+            //var patch = Brep.CreatePlanarBreps(curve);
+            //if (patch == null | patch.Count() == 0) { return null; }
+            //var patchMesh = Mesh.CreateFromBrep(patch[0]);            
+
+            // Generate an array of points
+            var bb = curve.GetBoundingBox(true);
+            var corns = bb.GetCorners();
+            #region Bbox corner order 
+            // Remarks:
+            //     [0] Min.X, Min.Y, Min.Z
+            //     [1] Max.X, Min.Y, Min.Z
+            //     [2] Max.X, Max.Y, Min.Z
+            //     [3] Min.X, Max.Y, Min.Z
+            //     [4] Min.X, Min.Y, Max.Z
+            //     [5] Max.X, Min.Y, Max.Z
+            //     [6] Max.X, Max.Y, Max.Z
+            //     [7] Min.X, Max.Y, Max.Z
+            #endregion
+            var xDim = corns[0].DistanceTo(corns[1]);
+            var yDim = corns[0].DistanceTo(corns[3]);
+            var startCorner = corns[0];
+
+            // If its too small fuck off
+            if(xSize*2 > xDim | ySize*2 > yDim) { return null; }
+
+            // Get the dimensions of the massing bbox
+            var xNumber = Math.Floor(xDim / xSize);
+            var yNumber = Math.Floor(yDim / ySize);
+            var xSpacing = xDim / xNumber;
+            var ySpacing = yDim / xNumber;
+
+            // Generate a point array
+            Dictionary<Tuple<int, int>, Core.Geometry.Point2d> points = new Dictionary<Tuple<int, int>, Core.Geometry.Point2d>();
+            for(int x = 0; x<xNumber; x++)
+            {
+                for(int y =0; y<yNumber; y++)
+                {
+                    var p = new Point3d(x * xSpacing, y * ySpacing, 0);
+                    points.Add(
+                        new Tuple<int, int>(x,y),
+                        p.ToFrixelPoint(Utilities.PointIsInsideOrOnCurve(curve, p, 0.01))
+                    );
+                }
+            }
+
+            // Crawl across the point array
+            for(int x = 0; x<xNumber; x++)
+            {
+                for(int y = 0; y<yNumber; y++)
+                {
+
+                }
+            }
+
+
+            //PointIsInsideOrOnCurve()
+
         }
 
         ///<summary>The only instance of this command.</summary>
