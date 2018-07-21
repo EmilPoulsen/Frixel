@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Domain.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="GeometryExtensions.cs" />
     <Compile Include="Geometry\Line2d.cs" />
     <Compile Include="Geometry\Point2d.cs" />
     <Compile Include="Pixel.cs" />

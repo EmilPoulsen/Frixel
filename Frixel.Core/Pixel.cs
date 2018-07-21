@@ -54,11 +54,19 @@ namespace Frixel.Core
 
     public class PixelStructure
     {
-        List<Point2d> Nodes;
-        List<int[]> Edges;
-        List<Pixel> Pixels;
+        public List<Point2d> Nodes;
+        public List<Edge> Edges;
+        public List<Pixel> Pixels;
 
         public PixelStructure() { }
+
+        public List<Line2d> GetLines()
+        {
+            return Edges.Select(e =>
+            {
+                return new Line2d(Nodes[e.Start], Nodes[e.End]);
+            }).ToList();
+        }
     }
 
     public enum PixelState
