@@ -11,9 +11,9 @@ namespace Frixel.Core
     {
         public readonly PixelState State;
         public readonly int TopLeft;
-        public int TopRight;
-        public int BottomRight;
-        public int BottomLeft;
+        public readonly int TopRight;
+        public readonly int BottomRight;
+        public readonly int BottomLeft;
 
         public Pixel(int topLeft, int topRight, int botLeft, int botRight, PixelState state)
         {
