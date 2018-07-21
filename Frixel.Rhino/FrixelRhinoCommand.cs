@@ -14,12 +14,14 @@ namespace Frixel.Rhinoceros
 {
     public class FrixelRhinoCommand : Command
     {
+        private bool _handlerIsAttached = false;
+        private Frixel.UI.MainWindow _window;
+
         public FrixelRhinoCommand()
         {
             // Rhino only creates one instance of each command class defined in a
             // plug-in, so it is safe to store a refence in a static property.
             Instance = this;
-            Frixel.UI.MainWindow.ReferenceFromRhino += MainWindow_ReferenceFromRhino;
         }
 
         private UI.FrixelReferenceData MainWindow_ReferenceFromRhino(double xSize, double ySize)
@@ -29,6 +31,7 @@ namespace Frixel.Rhinoceros
             go.SetCommandPrompt("Select a closed curve");
             go.GeometryFilter = ObjectType.Curve;
             go.GeometryAttributeFilter = GeometryAttributeFilter.ClosedCurve;
+            go.Get();
             var curves = go.Objects().Select(o => o.Curve());
             if (curves.Count() == 0) { return null; }
             var curve = curves.First();
@@ -56,14 +59,17 @@ namespace Frixel.Rhinoceros
             var yDim = corns[0].DistanceTo(corns[3]);
             var startCorner = corns[0];
 
+            // Create a 2d domain bbox 
+            Core.Domain2d Boundingbox = new Domain2d(new Core.Domain(corns[0].X, corns[1].X), new Core.Domain(corns[0].Y, corns[3].Y));
+
             // If its too small fuck off
             if(xSize*2 > xDim | ySize*2 > yDim) { return null; }
 
             // Get the dimensions of the massing bbox
-            var xNumber = Math.Floor(xDim / xSize);
-            var yNumber = Math.Floor(yDim / ySize);
+            var xNumber = Math.Ceiling(xDim / xSize);
+            var yNumber = Math.Ceiling(yDim / ySize);
             var xSpacing = xDim / xNumber;
-            var ySpacing = yDim / xNumber;
+            var ySpacing = yDim / yNumber;
 
             // Generate a point array
             Dictionary<Tuple<int, int>, Core.Geometry.Point2d> nodeDictionary = new Dictionary<Tuple<int, int>, Core.Geometry.Point2d>();
@@ -102,7 +108,8 @@ namespace Frixel.Rhinoceros
                         nodeDictionary.TryGetValue(botLeft, out botLeftPt) &&
                         nodeDictionary.TryGetValue(topLeft, out topLeftPt) &&
                         nodeDictionary.TryGetValue(topRight, out topRightPt) &&
-                        nodeDictionary.TryGetValue(botRight, out botRightPt)
+                        nodeDictionary.TryGetValue(botRight, out botRightPt) &&
+                        topLeftPt.IsInside && topRightPt.IsInside && botLeftPt.IsInside && botRightPt.IsInside
                         )
                     {
                         pixelList.Add(new Pixel(
@@ -189,7 +196,7 @@ namespace Frixel.Rhinoceros
             }
 
             // Return the data
-            return new UI.FrixelReferenceData(pixelStruct, massingLines);
+            return new UI.FrixelReferenceData(pixelStruct, massingLines, Boundingbox);
         }
 
         ///<summary>The only instance of this command.</summary>
@@ -245,14 +252,19 @@ namespace Frixel.Rhinoceros
             // ---
             #endregion
 
-            RhinoApp.WriteLine("Launching Frixel Window", EnglishName);
-            // Launch a FrixelWindow with a test structure
-            var window = new Frixel.UI.MainWindow();
-
-            if ((bool)window.ShowDialog())
-            {
-                RhinoApp.WriteLine("Operation Sucessful", EnglishName);
+            if (!_handlerIsAttached) {
+                Frixel.UI.MainWindow.ReferenceFromRhino += MainWindow_ReferenceFromRhino;
+                _handlerIsAttached = true;
             }
+
+            // Create a FrixelWindow
+            if(_window == null) { _window = new Frixel.UI.MainWindow();
+                RhinoApp.WriteLine("Launching Frixel Window", EnglishName);
+                new System.Windows.Interop.WindowInteropHelper(_window).Owner = Rhino.RhinoApp.MainWindowHandle();
+            }
+
+            // Show theFrixelWindow
+            _window.Show();
 
             return Result.Success;
         }
