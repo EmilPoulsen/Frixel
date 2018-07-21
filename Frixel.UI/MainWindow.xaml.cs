@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -49,14 +50,19 @@ namespace Frixel.UI
         private bool _isRunning;
         private bool _isRedrawing;
         private Tuple<Domain, Domain> _sliderMappingDomains;
+        private Optimizer.FrixelOptimizer _optimizer;
 
         private PixelStructure _pixelStructure;
         private List<Line2d> _actualMassingOutline;
         private Domain2d _massingDomain;
 
-        private AnalysisResults _analysisResults;
+        public static AnalysisResults AnalysisResults;
         private double _windLoad;
         private List<double> _dispMap = new List<double>();
+
+        private BackgroundWorker _bw = new BackgroundWorker();
+        private bool _bwComplete = true;
+        private int _completeGens = 0;
 
         public MainWindow(PixelStructure pixelStructure)
         {
@@ -95,12 +101,45 @@ namespace Frixel.UI
 
         private void Subscribe()
         {
+            _optimizer = new Optimizer.FrixelOptimizer();
+            _optimizer.RanIteration += _optimizer_RanIteration;
+            _bw.DoWork += _bw_DoWork;
+            _bw.WorkerSupportsCancellation = true;
+            _bw.RunWorkerCompleted += _bw_RunWorkerCompleted;
+        }
+
+        private void _bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            // Get a beer
+        }
+
+        private void _bw_DoWork(object sender, DoWorkEventArgs e)
+        {
+            _optimizer.Optimize(_pixelStructure);
+            _bwComplete = true;
+        }
+
+        private void _optimizer_RanIteration(object sender, EventArgs e)
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            {
+                // Ran iteration
+                var args = e as Optimizer.FrixelEventArgs;
+                if (args.AnalysisResults == null) { return; }
+                MainWindow.AnalysisResults = args.AnalysisResults;
+                Redisplace();
+                Redraw(true);
+                _completeGens++;
+                tb_Generations.Text = "completed " + _completeGens + " generations";
+            });
 
         }
 
         private void Unsubscribe()
         {
-
+            _optimizer.RanIteration -= _optimizer_RanIteration;
+            _bw.DoWork -= _bw_DoWork;
+            _bw.RunWorkerCompleted -= _bw_RunWorkerCompleted;
         }
 
         public void ShowWindow()
@@ -120,7 +159,6 @@ namespace Frixel.UI
         {
             this.grd_Message.Visibility = Visibility.Visible;
             this.grd_Message.Opacity = 1;
-            //this.ShowWarningMessageFade(this.grd_Message , 400);
         }
 
         private void HideWarningMessage()
@@ -171,7 +209,6 @@ namespace Frixel.UI
 
             storyboard.Begin(control);
         }
-
 
         private void WarningMessageCompleted(object sender, EventArgs e)
         {
@@ -248,14 +285,14 @@ namespace Frixel.UI
 
         private void sld_WindLoad_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (_analysisResults == null) { return; }
+            if (AnalysisResults == null) { return; }
             else { AnalyzeAndRedraw(); }
             tb_WindLoad.Text = Math.Round(sld_WindLoad.Value.Map(new Domain(0, 1), new Domain(0, 10))).ToString();
         }
 
         private void sld_GravLoad_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if(_analysisResults == null) { return; }
+            if(AnalysisResults == null) { return; }
             Redisplace();
             tb_GravLoad.Text = Math.Round(sld_GravLoad.Value.Map(new Domain(0, 1), new Domain(0, 10))).ToString();
         }
@@ -273,7 +310,6 @@ namespace Frixel.UI
 
         private void Redraw(bool renderDisp = false)
         {
-
             // Set state
             this._isRedrawing = true;
 
@@ -329,7 +365,14 @@ namespace Frixel.UI
                 int i = 0;
                 pxsLines.ForEach(l =>
                 {
-                    l.Stroke = new SolidColorBrush(Color.FromArgb(255, System.Convert.ToByte(edgeMap[i].Map(startingDomain, redDomain)), 0, 0));
+                    try
+                    {
+                        l.Stroke = new SolidColorBrush(Color.FromArgb(255, System.Convert.ToByte(edgeMap[i].Map(startingDomain, redDomain)), 0, 0));
+                    } catch
+                    {
+                        l.Stroke = Brushes.Black;
+                    }
+     
                     i++;
                 });
             }
@@ -380,6 +423,8 @@ namespace Frixel.UI
 
         private void AnalyzeAndRedraw()
         {
+            // Return if fucked
+            if(_pixelStructure == null) { return; }
             // Set stuff
             _pixelStructure.GravityLoad.Activated = true;
             _pixelStructure.GravityLoad.Amplification = 5000;
@@ -395,7 +440,7 @@ namespace Frixel.UI
             try
             {
                 var anal = new Optimizer.FrixelAnalyzer();
-                this._analysisResults = anal.Analyze(_pixelStructure);
+                MainWindow.AnalysisResults = anal.Analyze(_pixelStructure);
                 Redisplace();
                 Redraw(true);
             }
@@ -409,13 +454,13 @@ namespace Frixel.UI
                 {
                     BraceAll();
                     var anal = new Optimizer.FrixelAnalyzer();
-                    this._analysisResults = anal.Analyze(_pixelStructure);
+                    MainWindow.AnalysisResults = anal.Analyze(_pixelStructure);
                     Redisplace();
                     Redraw(true);
                 }
                 catch (Exception fuckit)
                 {
-                    this._analysisResults = null; Redraw(); //MessageBox.Show(asd.Message); }
+                    MainWindow.AnalysisResults = null; Redraw(); //MessageBox.Show(asd.Message); }
 
                 }
                 HideWarningMessage();
@@ -428,16 +473,16 @@ namespace Frixel.UI
             _dispMap.Clear();
             for (int i = 0; i < _pixelStructure.Nodes.Count; i++)
             {
-                _pixelStructure.DispNodes[i].X += _analysisResults.NodeResults[i].DispX * sld_GravLoad.Value;
-                _pixelStructure.DispNodes[i].Y += _analysisResults.NodeResults[i].DispY * sld_GravLoad.Value;
-                _dispMap.Add(_analysisResults.NodeResults[i].DispX + _analysisResults.NodeResults[i].DispY);
+                _pixelStructure.DispNodes[i].X += AnalysisResults.NodeResults[i].DispX * sld_GravLoad.Value;
+                _pixelStructure.DispNodes[i].Y += AnalysisResults.NodeResults[i].DispY * sld_GravLoad.Value;
+                _dispMap.Add(AnalysisResults.NodeResults[i].DispX + AnalysisResults.NodeResults[i].DispY);
             }
             Redraw(true);
         }
 
         private void btn_Reset_Click(object sender, RoutedEventArgs e)
         {
-            this._analysisResults = null;
+            MainWindow.AnalysisResults = null;
             var update = UpdateRhino(_xGridSize, _yGridSize);
             SetUpdated(update);
             Redraw();
@@ -466,14 +511,20 @@ namespace Frixel.UI
 
         private void btn_Optimize_Click(object sender, RoutedEventArgs e)
         {
-
+            if (_bw.IsBusy)
+            {
+                _bw.CancelAsync();
+                this.btn_Optimize.Content = "Optimize";
+            } else
+            {
+                // First analye
+                AnalyzeAndRedraw();
+                tb_Generations.Text = "";
+                _completeGens = 0;
+                _bw.RunWorkerAsync();
+                this.btn_Optimize.Content = "Cancel";
+            }
         }
 
-
-        // Pseudocode
-        // 1 Reference geometry - Anytime
-        // 1 Set up grid spacing - Anytime
-        //      Update draw for grid lines
-        //      Clear and update solver
     }
 }
