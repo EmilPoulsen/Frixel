@@ -174,7 +174,7 @@ namespace Frixel.Optimizer {
             var model = frixAnalyzer.BuildModel(_structure);
 
             var genes = chromosome.GetGenes();
-
+            Random rand = new Random();
             int i = 0;
             foreach (var g in genes) {
                 var pixswi = g.Value as PixSwitch;
@@ -182,7 +182,7 @@ namespace Frixel.Optimizer {
                 var pixel = _structure.Pixels[i];
 
                 //// HACK //////
-                Random rand = new Random();
+                
                 bool lol = rand.Next(0, 2) == 0;
                 pixswi.Switch = lol;
                 ///// HACK //////
@@ -215,9 +215,7 @@ namespace Frixel.Optimizer {
                 var pixswi = g.Value as PixSwitch;
                 var pixel = _structure.Pixels[i];
                 PixelResult pixResult = new PixelResult();
-
-
-
+                
                 if (pixel.LockedBrace) {
                     pixResult.IsBraced = true;
                 }
