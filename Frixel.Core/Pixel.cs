@@ -24,6 +24,17 @@ namespace Frixel.Core
             this.State = state;
         }
 
+        public List<Edge> GetEdges()
+        {
+            return new List<Edge>()
+            {
+                new Edge(this.TopLeft, this.TopRight),
+                new Edge(this.TopRight, this.BottomRight),
+                new Edge(this.BottomRight, this.BottomLeft),
+                new Edge(this.BottomLeft, this.TopLeft)
+            };
+        }
+
         public List<Edge> GetBracing()
         {
             switch (State)
@@ -37,6 +48,15 @@ namespace Frixel.Core
             };
             return new List<Edge>();
         }
+
+        public List<Edge> GetAllEdges()
+        {
+            var edgeList = new List<Edge>();
+            edgeList.AddRange(GetEdges());
+            edgeList.AddRange(GetBracing());
+            return edgeList;
+        }
+
     }
 
     public class Edge
@@ -50,6 +70,14 @@ namespace Frixel.Core
             this.End = e;
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() != typeof(Edge)) return false;
+            var objEdge = obj as Edge;
+            if (this.Start == objEdge.Start && this.End == objEdge.End) return true;
+            else return false;
+        }
+
     }
 
     public class PixelStructure
@@ -59,6 +87,22 @@ namespace Frixel.Core
         public List<Pixel> Pixels;
 
         public PixelStructure() { }
+
+        /// <summary>
+        /// Constructor for testing.
+        /// </summary>
+        /// <param name="nodes"></param>
+        /// <param name="pixels"></param>
+        public PixelStructure(List<Point2d> nodes, List<Pixel> pixels)
+        {
+            this.Nodes = nodes;
+            this.Pixels = pixels;
+
+            // Generates edges from pixels
+            var allEdges = pixels.SelectMany(p => p.GetEdges());
+
+            Edges = allEdges.Distinct().ToList();         
+        }
 
         public List<Line2d> GetLines()
         {
