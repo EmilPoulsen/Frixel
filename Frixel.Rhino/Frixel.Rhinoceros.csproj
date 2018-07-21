@@ -32,6 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -51,6 +53,7 @@
       <HintPath>C:\Program Files\Rhino 6\System\Rhino.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FrixelRhinoCommand.cs" />
@@ -59,6 +62,16 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\plugin-utility.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Frixel.Core\Frixel.Core.csproj">
+      <Project>{02d6340d-35cb-488c-bd0a-269d0a9b184d}</Project>
+      <Name>Frixel.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Frixel.UI\Frixel.UI.csproj">
+      <Project>{965b9fa9-591c-454a-876a-a849f570aefc}</Project>
+      <Name>Frixel.UI</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
