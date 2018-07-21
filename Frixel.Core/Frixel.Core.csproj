@@ -46,6 +46,7 @@
     <Compile Include="GeometryExtensions.cs" />
     <Compile Include="Geometry\Line2d.cs" />
     <Compile Include="Geometry\Point2d.cs" />
+    <Compile Include="ModelCreator.cs" />
     <Compile Include="Pixel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Test\TestObjects.cs" />
