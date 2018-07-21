@@ -90,6 +90,8 @@ namespace Frixel.UI
             _yGridSize = GridSize(sld_GridY.Value);
             _isRedrawing = false;
             DrawGridSize();
+            this.lb_Results.MaxHeight = this.lb_Results.ActualHeight;
+            this.lb_Results.MaxWidth = this.lb_Results.ActualWidth;
             Subscribe();
         }
 
@@ -130,12 +132,25 @@ namespace Frixel.UI
                 var args = e as Optimizer.FrixelEventArgs;
                 if (args.AnalysisResults == null) { return; }
                 MainWindow.AnalysisResults = args.AnalysisResults;
+                UpdateBracing();
                 Redisplace();
                 Redraw(true);
                 _completeGens++;
                 tb_Generations.Text = "completed " + _completeGens + " generations";
             });
 
+        }
+
+        private void UpdateBracing()
+        {
+            var shouldbebraced = MainWindow.AnalysisResults.PixelResults.Select(p => p.Value.IsBraced).ToList();
+            for(int i = 0; i<this._pixelStructure.Pixels.Count; i++)
+            {
+                if (shouldbebraced[i])
+                {
+                    this._pixelStructure.Pixels[i].ChangeStateTo(PixelState.Moment);
+                }
+            }
         }
 
         private void Unsubscribe()
@@ -467,6 +482,9 @@ namespace Frixel.UI
 
                 }
                 HideWarningMessage();
+                if(MainWindow.AnalysisResults == null) { return; }
+                lb_Results.Items.Clear();
+                MainWindow.AnalysisResults.NodeResults.Select(r => r.Value.DispX.ToString() + "," + r.Value.DispY.ToString()).ToList().ForEach(r => lb_Results.Items.Add(r));
             }
         }
 
@@ -527,7 +545,7 @@ namespace Frixel.UI
                 _completeGens = 0;
                 _bwComplete = false;
                 _bw.RunWorkerAsync();
-                this.btn_Optimize.Content = "Cancel";
+                this.btn_Optimize.Content = "Optimize";
             }
         }
 
