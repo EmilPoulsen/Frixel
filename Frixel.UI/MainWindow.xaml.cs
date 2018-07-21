@@ -46,12 +46,14 @@ namespace Frixel.UI
         public MainWindow()
         {
             InitializeComponent();
+            _pixelStructure = Core.Test.TestObjects.TestStructure;
             _sliderMappingDomains = new Tuple<Domain, Domain>(new Domain(0, 1), new Domain(SliderMin, SliderMax));
             _isRunning = false;
             _xGridSize = GridSize(sld_GridX.Value);
             _yGridSize = GridSize(sld_GridY.Value);
             _isRedrawing = false;
             DrawGridSize();
+            Redraw();
         }
 
         private double GridSize(double sliderValue)
@@ -84,6 +86,9 @@ namespace Frixel.UI
             _yGridSize = GridSize(sld_GridY.Value);
             DrawGridSize();
         }
+
+
+        #endregion
 
         private void Redraw()
         {
@@ -131,7 +136,6 @@ namespace Frixel.UI
             this.canv_Main.Children.Clear();
         }
 
-        #endregion
 
         // Pseudocode
         // 1 Reference geometry - Anytime
