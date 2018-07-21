@@ -115,8 +115,11 @@ namespace Frixel.UI
 
         private void _bw_DoWork(object sender, DoWorkEventArgs e)
         {
-            _optimizer.Optimize(_pixelStructure);
-            _bwComplete = true;
+            if (!_bwComplete)
+            {
+                _optimizer.Optimize(_pixelStructure);
+                _bwComplete = true;
+            }
         }
 
         private void _optimizer_RanIteration(object sender, EventArgs e)
@@ -515,12 +518,14 @@ namespace Frixel.UI
             {
                 _bw.CancelAsync();
                 this.btn_Optimize.Content = "Optimize";
+                _bwComplete = true;
             } else
             {
                 // First analye
                 AnalyzeAndRedraw();
                 tb_Generations.Text = "";
                 _completeGens = 0;
+                _bwComplete = false;
                 _bw.RunWorkerAsync();
                 this.btn_Optimize.Content = "Cancel";
             }
