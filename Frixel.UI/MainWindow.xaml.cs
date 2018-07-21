@@ -43,10 +43,10 @@ namespace Frixel.UI
         private PixelStructure _pixelStructure;
 
 
-        public MainWindow()
+        public MainWindow(PixelStructure pixelStructure)
         {
             InitializeComponent();
-            _pixelStructure = Core.Test.TestObjects.TestStructure;
+            _pixelStructure = pixelStructure;
             _sliderMappingDomains = new Tuple<Domain, Domain>(new Domain(0, 1), new Domain(SliderMin, SliderMax));
             _isRunning = false;
             _xGridSize = GridSize(sld_GridX.Value);
@@ -60,7 +60,7 @@ namespace Frixel.UI
         {
             // Slider domain is always 0 to 1.
             // Map the value to our domain of Slidermin to SliderMax
-            return sliderValue.Map(_sliderMappingDomains.Item1, _sliderMappingDomains.Item2);
+            return sliderValue.MapRound(_sliderMappingDomains.Item1, _sliderMappingDomains.Item2);
         }
 
         private void DrawGridSize()
@@ -72,7 +72,8 @@ namespace Frixel.UI
 
         private void btn_RefGeo_Click(object sender, RoutedEventArgs e)
         {
-
+            // Something
+            this.Redraw();
         }
 
         private void sld_GridX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -103,20 +104,20 @@ namespace Frixel.UI
 
             // Get canvas properties
             var canvasWidth = this.canv_Main.ActualWidth;
-            var canvasHeight = this.canv_Main.ActualHeight;
+            var canvasHeight = this.canv_Main.ActualHeight; // Test height
 
             // Get domain of our collection of points in x and Y
             Domain2d pxlSDomain = _pixelStructure.Nodes.GetBoundingBox();
 
             // Get canvas ready lines
             var canvasDomain = new Domain2d(
-                new Domain(0 + CanvasMargin, canvasWidth - CanvasMargin),
-                new Domain(0 + CanvasMargin, canvasHeight - CanvasMargin)
+                new Domain(canvasWidth - CanvasMargin, 0 + CanvasMargin),
+                new Domain(canvasHeight - CanvasMargin, 0 + CanvasMargin)
                 );
 
             List<Line> linesToDraw = _pixelStructure.GetLines().Select(l =>
             {
-                return l.Map(pxlSDomain, canvasDomain).ToCanvasLine();
+                return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Black);
             }).ToList();
 
             // Add lines to canvas 

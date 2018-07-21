@@ -28,12 +28,13 @@ namespace Frixel.Core.Geometry
 
         public Line2d Map(Domain2d from, Domain2d to)
         {
-            return new Line2d(
-                new Point2d(this.Start.X.Map(from.X, to.X),
-                            this.Start.Y.Map(from.Y, to.Y)),
-                new Point2d(this.End.X.Map(from.X, to.X),
-                            this.End.Y.Map(from.Y, to.Y))
-            );
+            var start = new Point2d(this.Start.X.Map(from.X, to.X),
+                            this.Start.Y.Map(from.Y, to.Y));
+            var end = new Point2d(this.End.X.Map(from.X, to.X),
+                            this.End.Y.Map(from.Y, to.Y));
+
+            var line = new Line2d(start, end);
+            return line;
         }
     }
 }
