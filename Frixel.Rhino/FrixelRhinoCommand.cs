@@ -16,6 +16,7 @@ namespace Frixel.Rhinoceros
     {
         private bool _handlerIsAttached = false;
         private Frixel.UI.MainWindow _window;
+        private RhinoDoc _doc;
 
         public FrixelRhinoCommand()
         {
@@ -59,6 +60,9 @@ namespace Frixel.Rhinoceros
             var yDim = corns[0].DistanceTo(corns[3]);
             var startCorner = corns[0];
 
+            // TEST
+            //bb.GetCorners().ToList().ForEach(p => _doc.Objects.AddPoint(p));
+
             // Create a 2d domain bbox 
             Core.Domain2d Boundingbox = new Domain2d(new Core.Domain(corns[0].X, corns[1].X), new Core.Domain(corns[0].Y, corns[3].Y));
 
@@ -71,19 +75,30 @@ namespace Frixel.Rhinoceros
             var xSpacing = xDim / xNumber;
             var ySpacing = yDim / yNumber;
 
+            List<Point3d> nodePointTests = new List<Point3d>();
+            List<Point3d> nodePoints = new List<Point3d>();
+
             // Generate a point array
             Dictionary<Tuple<int, int>, Core.Geometry.Point2d> nodeDictionary = new Dictionary<Tuple<int, int>, Core.Geometry.Point2d>();
-            for(int x = 0; x<xNumber; x++)
+            for(int x = 0; x<=xNumber; x++)
             {
-                for(int y =0; y<yNumber; y++)
+                for(int y =0; y<=yNumber; y++)
                 {
-                    var p = new Point3d(x * xSpacing, y * ySpacing, 0);
+                    var p = new Point3d((x * xSpacing)+ startCorner.X, (y * ySpacing) + startCorner.Y, 0);
+                    nodePoints.Add(p);
                     nodeDictionary.Add(
-                        new Tuple<int, int>(x,y),
-                        p.ToFrixelPoint(Utilities.PointIsInsideOrOnCurve(curve, p, 0.01))
-                    );
+                        new Tuple<int, int>(x, y),
+                        p.ToFrixelPoint(Utilities.PointIsInsideOrOnCurve(curve, p, 0.01)));
+                        if (Utilities.PointIsInsideOrOnCurve(curve, p, 0.01)) { nodePointTests.Add(p); }
                 }
             }
+
+            //nodePointTests.ForEach(p => _doc.Objects.AddPoint(p));
+            _doc.Views.Redraw();
+            string wait = "";
+            //nodePoints.ForEach(p => _doc.Objects.AddPoint(p));
+            _doc.Views.Redraw();
+            wait = "";
 
 
             // Crawl across the point array and crete pixels
@@ -109,7 +124,7 @@ namespace Frixel.Rhinoceros
                         nodeDictionary.TryGetValue(topLeft, out topLeftPt) &&
                         nodeDictionary.TryGetValue(topRight, out topRightPt) &&
                         nodeDictionary.TryGetValue(botRight, out botRightPt) &&
-                        topLeftPt.IsInside && topRightPt.IsInside && botLeftPt.IsInside && botRightPt.IsInside
+                        Utilities.AtLeastXInside(topLeftPt.IsInside, topRightPt.IsInside, botLeftPt.IsInside, botRightPt.IsInside, 2)
                         )
                     {
                         pixelList.Add(new Pixel(
@@ -164,9 +179,12 @@ namespace Frixel.Rhinoceros
                 foreach (var p in nodeList.Select(n => new Point3d(n.X, n.Y, 0)))
                 {
                     double dist = double.PositiveInfinity;
-                    crv.ClosestPoint(p, out dist);
+                    double t = 0;
+                    crv.ClosestPoint(p, out t, 100);
+                    var crvPt = crv.PointAt(t);
+                    dist = crvPt.DistanceTo(p);
                     // First cycle
-                    if(closestPoint == null) { closestPoint = new Tuple<double, int>(dist, i); continue; }
+                    if(closestPoint == null) { closestPoint = new Tuple<double, int>(dist, i); i++; continue; }
 
                     // If its closer
                     if(!double.IsInfinity(dist) && dist < closestPoint.Item1 ) {
@@ -174,7 +192,34 @@ namespace Frixel.Rhinoceros
                     }
                     i++;
                 }
-                var closestNode = nodeList[i];
+                var closestNode = nodeList[closestPoint.Item2];
+                var coord = nodeDictionary.Where(x => x.Value == closestNode).First().Key;
+                bool xDir = pt0.X - pt1.X > pt0.Y - pt1.Y;
+                if (xDir)
+                {
+                    var horzPts = nodeDictionary.Where(x => x.Key.Item2 == coord.Item2).ToList().Select(x => x.Value);
+                    foreach(var pt in horzPts)
+                    {
+                        var myCoord = nodeList.IndexOf(pt);
+                        foreach (var p in pixelList.Where(p => p.ContainsNode(myCoord)).ToList())
+                        {
+                            p.ChangeStateTo(PixelState.Moment);
+                        }
+                    }
+                }
+                else
+                {
+                    var vertPts = nodeDictionary.Where(x => x.Key.Item1 == coord.Item1).ToList().Select(x => x.Value);
+                    foreach (var pt in vertPts)
+                    {
+                        var myCoord = nodeList.IndexOf(pt);
+                        foreach (var p in pixelList.Where(p => p.ContainsNode(myCoord)).ToList())
+                        {
+                            p.ChangeStateTo(PixelState.Moment);
+                        }
+                    }
+                }
+   
                 foreach(var p in pixelList.Where(p => p.ContainsNode(i)).ToList())
                 {
                     p.ChangeStateTo(PixelState.Moment);
@@ -261,6 +306,7 @@ namespace Frixel.Rhinoceros
             if(_window == null) { _window = new Frixel.UI.MainWindow();
                 RhinoApp.WriteLine("Launching Frixel Window", EnglishName);
                 new System.Windows.Interop.WindowInteropHelper(_window).Owner = Rhino.RhinoApp.MainWindowHandle();
+                this._doc = doc;
             }
 
             // Show theFrixelWindow

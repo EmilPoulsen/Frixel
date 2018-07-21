@@ -16,6 +16,26 @@ namespace Frixel.Core
             this.Min = min;
             this.Max = max;
         }
+
+        public double Size
+        {
+            get
+            {
+                return Math.Abs(this.Max - this.Min);
+            }
+        }
+
+        public bool IsLargerThan(Domain b)
+        {
+            return this.Size > b.Size;
+        }
+
+        public void ScaleMid(double factor)
+        {
+            var fullMovementDist = this.Size - (this.Size * factor);
+            this.Min += fullMovementDist / 2;
+            this.Max -= fullMovementDist / 2;
+        }
     }
 
     public class Domain2d
@@ -27,6 +47,21 @@ namespace Frixel.Core
         {
             this.X = x;
             this.Y = y;
+        }
+
+        public double AspectRatioX
+        {
+            get
+            {
+                return X.Size / Y.Size;
+            }
+        }
+        public double AspectRatioY
+        {
+            get
+            {
+                return Y.Size / X.Size;
+            }
         }
     }
 }

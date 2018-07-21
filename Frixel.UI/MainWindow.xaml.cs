@@ -152,9 +152,20 @@ namespace Frixel.UI
 
             // Get canvas ready lines
             var canvasDomain = new Domain2d(
-                new Domain(canvasWidth - CanvasMargin, 0 + CanvasMargin),
+                new Domain(0 + CanvasMargin, canvasWidth - CanvasMargin),
                 new Domain(canvasHeight - CanvasMargin, 0 + CanvasMargin)
                 );
+            // Scale the canvas domain to the aspect ratio of the input domain
+            if (_massingDomain.X.IsLargerThan(_massingDomain.Y))
+            {
+                double YscaleFactor = _massingDomain.AspectRatioY;
+                canvasDomain.Y.ScaleMid(YscaleFactor);
+            }
+            else
+            {
+                double XscaleFactor = _massingDomain.AspectRatioX;
+                canvasDomain.Y.ScaleMid(XscaleFactor);
+            }
 
             List<Line> pxsLines = _pixelStructure.GetAllLInes().Select(l =>
             {
