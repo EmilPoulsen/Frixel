@@ -18,6 +18,20 @@ using GeneticSharp.Domain.Randomizations;
 namespace Frixel.Optimizer {
 
 
+    public class FrixelOptimizer{
+
+        public FrixelOptimizer() {
+
+        }
+
+
+        
+
+
+
+    }
+
+
     public class PixSwitch {
         public PixSwitch() {
 
@@ -66,18 +80,24 @@ namespace Frixel.Optimizer {
     }
 
     public class StructuralFitness : IFitness {
-        FiniteElementModel _model;
+        //FiniteElementModel _model;
         PixelStructure _structure;
 
 
         public StructuralFitness(FiniteElementModel model, PixelStructure structure) {
-            _model = model;
+            //_model = model;
             _structure = structure;
         }
 
-        public double Evaluate(IChromosome chromosome) {
-            
+        IMaterial _material = new GenericElasticMaterial(7700, 210.0e9, 0.3, 210.0e9 / 2.69);
+        ICrossSection _section = new SolidRectangle(0.03, 0.01);
 
+
+        public double Evaluate(IChromosome chromosome) {
+            FrixelAnalyzer frixAnalyzer = new FrixelAnalyzer();
+
+            var model = frixAnalyzer.BuildModel(_structure);
+            
             var genes = chromosome.GetGenes();
 
             int i = 0;
@@ -87,22 +107,47 @@ namespace Frixel.Optimizer {
                 var pixel = _structure.Pixels[i];
 
 
-                if (pixel.LockedBrace) {
+                if (!pixel.LockedBrace) {
 
+                    var bracing = pixel.GetBracing();
+                    foreach (var brace in bracing) {
+                        int s = brace.Start;
+                        int e = brace.End;
+
+                        var sNode = model.Nodes.ElementAt(s);
+                        var eNode = model.Nodes.ElementAt(e);
+
+                        model.ElementFactory.CreateLinearTruss(sNode, eNode, _material, _section);
+                    }
                 }
-                
+            }
+            var results = frixAnalyzer.AnalyzeModel(model);
 
-                //int index = pixswi.PixIndex;
-                
-                //Convert.ToInt32(g.Value, CultureInfo.InvariantCulture);
-                //distanceSum += CalcDistanceTwoCities(Cities[currentCityIndex], Cities[lastCityIndex]);
-                //lastCityIndex = currentCityIndex;
+            double max = double.MinValue;
 
-                //citiesIndexes.Add(lastCityIndex);
+            foreach (var pair in results.NodeResults) {
+                var res = pair.Value;
+
+                double dist = Math.Sqrt(Math.Pow(res.DispX, 2) + Math.Pow(res.DispY, 2));
+
+                if(dist > max) {
+                    max = dist;
+                }
             }
 
+            //double weight = CalcWeight(model);
+            
+            return max;
+        }
+        
+        public double CalcWeight(FiniteElementModel model) {
+            double tot = 0;
 
-            return -1;
+            foreach (var elem in model.Elements) {
+                tot += elem.Weight;
+            }
+
+            return tot;
         }
     }
 }

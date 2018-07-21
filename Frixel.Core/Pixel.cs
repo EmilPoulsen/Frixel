@@ -222,9 +222,9 @@ namespace Frixel.Core {
         
     }
 
-    public class _analysisResults {
+    public class AnalysisResults {
 
-        public _analysisResults() {
+        public AnalysisResults() {
             this.NodeResults = new Dictionary<int, NodeResult>();
         }
 
