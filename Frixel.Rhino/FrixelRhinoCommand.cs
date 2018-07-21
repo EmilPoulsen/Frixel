@@ -7,6 +7,8 @@ using Rhino.DocObjects;
 using Rhino.Geometry;
 using Rhino.Input;
 using Rhino.Input.Custom;
+using Frixel.Rhinoceros.Extensions;
+using Frixel.Core;
 
 namespace Frixel.Rhinoceros
 {
@@ -31,7 +33,163 @@ namespace Frixel.Rhinoceros
             if (curves.Count() == 0) { return null; }
             var curve = curves.First();
 
-            // Bring the curve into our interface
+            // Create a mesh from the closed curve
+            //var patch = Brep.CreatePlanarBreps(curve);
+            //if (patch == null | patch.Count() == 0) { return null; }
+            //var patchMesh = Mesh.CreateFromBrep(patch[0]);            
+
+            // Generate an array of points
+            var bb = curve.GetBoundingBox(true);
+            var corns = bb.GetCorners();
+            #region Bbox corner order 
+            // Remarks:
+            //     [0] Min.X, Min.Y, Min.Z
+            //     [1] Max.X, Min.Y, Min.Z
+            //     [2] Max.X, Max.Y, Min.Z
+            //     [3] Min.X, Max.Y, Min.Z
+            //     [4] Min.X, Min.Y, Max.Z
+            //     [5] Max.X, Min.Y, Max.Z
+            //     [6] Max.X, Max.Y, Max.Z
+            //     [7] Min.X, Max.Y, Max.Z
+            #endregion
+            var xDim = corns[0].DistanceTo(corns[1]);
+            var yDim = corns[0].DistanceTo(corns[3]);
+            var startCorner = corns[0];
+
+            // If its too small fuck off
+            if(xSize*2 > xDim | ySize*2 > yDim) { return null; }
+
+            // Get the dimensions of the massing bbox
+            var xNumber = Math.Floor(xDim / xSize);
+            var yNumber = Math.Floor(yDim / ySize);
+            var xSpacing = xDim / xNumber;
+            var ySpacing = yDim / xNumber;
+
+            // Generate a point array
+            Dictionary<Tuple<int, int>, Core.Geometry.Point2d> nodeDictionary = new Dictionary<Tuple<int, int>, Core.Geometry.Point2d>();
+            for(int x = 0; x<xNumber; x++)
+            {
+                for(int y =0; y<yNumber; y++)
+                {
+                    var p = new Point3d(x * xSpacing, y * ySpacing, 0);
+                    nodeDictionary.Add(
+                        new Tuple<int, int>(x,y),
+                        p.ToFrixelPoint(Utilities.PointIsInsideOrOnCurve(curve, p, 0.01))
+                    );
+                }
+            }
+
+
+            // Crawl across the point array and crete pixels
+            var nodeList = nodeDictionary.Values.ToList();
+            List<Pixel> pixelList = new List<Pixel>();
+            for(int x = 0; x<xNumber; x++)
+            {
+                for (int y = 0; y < yNumber; y++)
+                {
+                    if (!nodeDictionary.ContainsKey(new Tuple<int, int>(x, y))) continue;
+                    var currentPoint = nodeDictionary[new Tuple<int, int>(x, y)];
+                    var topLeft = new Tuple<int, int>(x, y + 1);
+                    var topRight = new Tuple<int, int>(x + 1, y + 1);
+                    var botLeft = new Tuple<int, int>(x, y);
+                    var botRight = new Tuple<int, int>(x + 1, y);
+                    Core.Geometry.Point2d topLeftPt;
+                    Core.Geometry.Point2d topRightPt;
+                    Core.Geometry.Point2d botLeftPt;
+                    Core.Geometry.Point2d botRightPt;
+
+                    if (
+                        nodeDictionary.TryGetValue(botLeft, out botLeftPt) &&
+                        nodeDictionary.TryGetValue(topLeft, out topLeftPt) &&
+                        nodeDictionary.TryGetValue(topRight, out topRightPt) &&
+                        nodeDictionary.TryGetValue(botRight, out botRightPt)
+                        )
+                    {
+                        pixelList.Add(new Pixel(
+                            nodeList.IndexOf(topLeftPt),
+                            nodeList.IndexOf(topRightPt),
+                            nodeList.IndexOf(botLeftPt),
+                            nodeList.IndexOf(botRightPt),
+                            PixelState.None
+                            ));
+                    }
+                }
+            }
+
+            // Get user input for spine
+            bool unsucessfulGetSpine = false;
+            Point3d pt0 = new Point3d(0,0,0);
+            using (GetPoint getPointAction = new GetPoint())
+            {
+                getPointAction.SetCommandPrompt("Spine: start point");
+                if (getPointAction.Get() != GetResult.Point)
+                {
+                    unsucessfulGetSpine = true;
+                    //RhinoApp.WriteLine("No start point was selected.");
+                    //return getPointAction.CommandResult();
+                }
+                if (!unsucessfulGetSpine) { pt0 = getPointAction.Point(); }
+
+            }
+
+            Point3d pt1 = new Point3d(0, 0, 0);
+            using (GetPoint getPointAction = new GetPoint())
+            {
+                getPointAction.SetCommandPrompt("Spine: end point");
+                getPointAction.SetBasePoint(pt0, true);
+                getPointAction.DynamicDraw +=
+                  (sender, e) => e.Display.DrawLine(pt0, e.CurrentPoint, System.Drawing.Color.DarkRed);
+                if (getPointAction.Get() != GetResult.Point)
+                {
+                    unsucessfulGetSpine = true;
+                    //RhinoApp.WriteLine("No end point was selected.");
+                    //return getPointAction.CommandResult();
+                }
+                if (!unsucessfulGetSpine) { pt1 = getPointAction.Point(); }
+            }
+
+            // Find the closest node to the spine line
+            if (!unsucessfulGetSpine)
+            {
+                Tuple<double, int> closestPoint = null;
+                var crv = new Rhino.Geometry.Line(pt0, pt1).ToNurbsCurve();
+                int i = 0;
+                foreach (var p in nodeList.Select(n => new Point3d(n.X, n.Y, 0)))
+                {
+                    double dist = double.PositiveInfinity;
+                    crv.ClosestPoint(p, out dist);
+                    // First cycle
+                    if(closestPoint == null) { closestPoint = new Tuple<double, int>(dist, i); continue; }
+
+                    // If its closer
+                    if(!double.IsInfinity(dist) && dist < closestPoint.Item1 ) {
+                        closestPoint = new Tuple<double, int>(dist, i);
+                    }
+                    i++;
+                }
+                var closestNode = nodeList[i];
+                foreach(var p in pixelList.Where(p => p.ContainsNode(i)).ToList())
+                {
+                    p.ChangeStateTo(PixelState.Moment);
+                }
+            }
+            
+            // Create the pixel structure
+            var pixelStruct = new Core.PixelStructure(nodeList, pixelList);
+
+            // Get the line representation of our massing
+            List<Core.Geometry.Line2d> massingLines = new List<Core.Geometry.Line2d>();
+            var pline = curve.ToPolyline(0.01, Math.PI, 1, 1);
+            var plinePoints = pline.ToPolyline().ToArray();
+            for(int i = 0; i<plinePoints.Count()-1; i++)
+            {
+                massingLines.Add(new Core.Geometry.Line2d(plinePoints[i].ToFrixelPoint(),
+                                                          plinePoints[i + 1].ToFrixelPoint())
+                );
+            }
+
+            // Return the data
+            return new UI.FrixelReferenceData(pixelStruct, massingLines);
         }
 
         ///<summary>The only instance of this command.</summary>
@@ -89,7 +247,7 @@ namespace Frixel.Rhinoceros
 
             RhinoApp.WriteLine("Launching Frixel Window", EnglishName);
             // Launch a FrixelWindow with a test structure
-            var window = new Frixel.UI.MainWindow(Core.Test.TestObjects.TestStructure);
+            var window = new Frixel.UI.MainWindow();
 
             if ((bool)window.ShowDialog())
             {

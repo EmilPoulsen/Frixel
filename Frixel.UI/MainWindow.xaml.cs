@@ -62,6 +62,17 @@ namespace Frixel.UI
             Redraw();
         }
 
+        public MainWindow()
+        {
+            InitializeComponent();
+            _sliderMappingDomains = new Tuple<Domain, Domain>(new Domain(0, 1), new Domain(SliderMin, SliderMax));
+            _isRunning = false;
+            _xGridSize = GridSize(sld_GridX.Value);
+            _yGridSize = GridSize(sld_GridY.Value);
+            _isRedrawing = false;
+            DrawGridSize();
+        }
+
         private double GridSize(double sliderValue)
         {
             // Slider domain is always 0 to 1.
@@ -79,6 +90,8 @@ namespace Frixel.UI
         private void btn_RefGeo_Click(object sender, RoutedEventArgs e)
         {
             var refData = ReferenceFromRhino(_xGridSize,_yGridSize);
+            if(refData == null) { return; }
+
             SetReferenceData(refData);
             this.Redraw();
         }
@@ -116,14 +129,15 @@ namespace Frixel.UI
 
         private void Redraw()
         {
+            // Reasons to fuck off
+            if (CanvasIsSmall()) { return; }
+            if (this._pixelStructure == null | this._actualMassingOutline == null) { return; }
+
             // Set state
             this._isRedrawing = true;
 
             // Clear canvas
             ClearCanvas();
-
-            // If canvas is too small fuck off
-            if (CanvasIsSmall()) { this._isRedrawing = false; return; }
 
             // Get canvas properties
             var canvasWidth = this.canv_Main.ActualWidth;

@@ -7,7 +7,7 @@ using Frixel.Core.Geometry;
 
 namespace Frixel.Core {
     public class Pixel {
-        public readonly PixelState State;
+        public PixelState State { get; private set; }
         public readonly int TopLeft;
         public readonly int TopRight;
         public readonly int BottomRight;
@@ -48,6 +48,23 @@ namespace Frixel.Core {
             edgeList.AddRange(GetEdges());
             edgeList.AddRange(GetBracing());
             return edgeList;
+        }
+
+        public bool ContainsNode(int nodeIndex)
+        {
+            if (this.BottomLeft == nodeIndex
+              | this.BottomRight == nodeIndex
+              | this.TopLeft == nodeIndex
+              | this.TopRight == nodeIndex)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public void ChangeStateTo(PixelState state)
+        {
+            this.State = state;
         }
 
     }
