@@ -51,7 +51,7 @@ namespace Frixel.Optimizer {
             var selection = new EliteSelection();
             var crossover = new UniformCrossover(0.5f);
             var mutation = new UniformMutation(); //FlipBitMutation();
-            var termination = new FitnessStagnationTermination(100);
+            var termination = new FitnessStagnationTermination(10);
 
             var ga = new GeneticAlgorithm(
                 population,
@@ -66,7 +66,9 @@ namespace Frixel.Optimizer {
 
             ga.Start();
 
-            return null;
+            var structRes = ga.BestChromosome as MyProblemChromosome;
+
+            return structRes.Results; 
 
         }
 
@@ -105,6 +107,10 @@ namespace Frixel.Optimizer {
         // of your chromosome.
         int _numPixels;
 
+
+        public AnalysisResults Results { get; set; }
+
+
         public MyProblemChromosome(int numPixels) : base(numPixels) {
 
             _numPixels = numPixels;
@@ -131,7 +137,7 @@ namespace Frixel.Optimizer {
 
             PixSwitch piswi = new PixSwitch();
             int s = RandomizationProvider.Current.GetInt(0, 1);
-            piswi.Switch = s == 0 ? false : true;
+            piswi.Switch = false;//s == 0 ? false : true;
 
             return new Gene(piswi);
 
@@ -140,7 +146,7 @@ namespace Frixel.Optimizer {
         public override IChromosome CreateNew() {
             return new MyProblemChromosome(_numPixels);
         }
-
+        
         //public void FlipGene(int index) {
         //    //throw new NotImplementedException();
         //}
@@ -176,8 +182,11 @@ namespace Frixel.Optimizer {
                 if (!pixel.LockedBrace) {
 
                     if (pixswi.Switch) {
-
-                        var bracing = pixel.GetBracing();
+                        
+                        var x1 = new Edge(pixel.TopLeft, pixel.BottomRight);
+                        var x2 = new Edge(pixel.TopRight, pixel.BottomLeft);
+                        var bracing = new List<Edge>() { x1, x2 };
+                        
                         foreach (var brace in bracing) {
                             int s = brace.Start;
                             int e = brace.End;
@@ -212,6 +221,8 @@ namespace Frixel.Optimizer {
             
             this.LatestResults = results;
             double max = double.MinValue;
+
+            (chromosome as MyProblemChromosome).Results = results;
 
             foreach (var pair in results.NodeResults) {
                 var res = pair.Value;
