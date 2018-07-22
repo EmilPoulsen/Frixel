@@ -3,7 +3,7 @@
 
 ![Alt Text](https://github.com/EmilPoulsen/Frixel/blob/master/doc/logo_100x100.png)
 
-Frixel is a finite element analysis program that’s so easy a 5 year old could use it. Provided only a closed curve representing a building massing and location for core, Frixel generates a 2 dimensional grid and runs structural analysis on it. You can tweak grid size, gravitation magnitude and lateral wind force to see how your design perfoms under different conditions. Additionaly, it can run structural topology optimization to improve its mechanical performance by adding bracing in appropriate places.
+Frixel is a finite element analysis program that’s so easy a 5 year old could use it. Provided only a closed curve representing a building massing and location for core, Frixel generates a 2 dimensional grid and runs structural analysis on it. You can tweak grid size, gravitation magnitude and lateral wind force to see how your design perfoms under different conditions. Additionally, it can run structural topology optimization to improve its mechanical performance by adding bracing in appropriate places.
 
 User Interface             |  Building analysis
 :-------------------------:|:-------------------------:
@@ -11,7 +11,7 @@ User Interface             |  Building analysis
 **Cantilever analysis** | **Optimization**
 ![Alt Text](https://github.com/EmilPoulsen/Frixel/blob/master/doc/Frixel_C.gif)  |  ![Alt Text](https://github.com/EmilPoulsen/Frixel/blob/master/doc/Frixel_B.gif)
 
-## Funcitonality
+## Functionality
 - A power-up for architect-engineer collaboration.
 - A great way to test and guide options in early stage design.
 - Fast. You can quickly get an understanding of structural behavior.
