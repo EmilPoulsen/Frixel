@@ -1,7 +1,7 @@
 # Frixel
-*Frame x Pixel*
+*Frame x Pixel* 
 
-![Alt Text](https://github.com/EmilPoulsen/Frixel/blob/master/doc/logo.png)
+![Alt Text](https://github.com/EmilPoulsen/Frixel/blob/master/doc/logo_100x100.png)
 
 Frixel is a finite element analysis program that’s so easy a 5 year old could use it. Provided only a closed boundary representation and location for core, Frixel generates a 2 dimensional grid and runs structural analysis on it. You can tweak gravitation magnitude and lateral wind force to see how your designs perfom under different loading conditions. Additionaly, it can run structural topology optimization to improve its mechanical performance.
 
@@ -37,6 +37,7 @@ Frixel was developed from scratch under 24 intense hours at the [beyondAEC Hacka
 
 ## Notes
 - Platform agnostic, prototype for Rhino 6
+- Needs a special build of SharpFE.Core.dll, which is included in the lib folder.
 
 ## Roadmap
 - Make optimization robust/verify output
