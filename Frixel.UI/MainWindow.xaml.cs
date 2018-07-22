@@ -44,7 +44,6 @@ namespace Frixel.UI
         public delegate FrixelReferenceData PixelStructureUpdate(double xSize, double ySize);
         public static event PixelStructureUpdate UpdateRhino;
 
-
         private double _xGridSize;
         private double _yGridSize;
         private bool _isRunning;
@@ -63,6 +62,8 @@ namespace Frixel.UI
         private BackgroundWorker _bw = new BackgroundWorker();
         private bool _bwComplete = true;
         private int _completeGens = 0;
+
+        #region CTOR
 
         public MainWindow(PixelStructure pixelStructure)
         {
@@ -95,12 +96,6 @@ namespace Frixel.UI
             Subscribe();
         }
 
-        protected override void OnClosed(EventArgs e)
-        {
-            base.OnClosed(e);
-            Unsubscribe();
-        }
-
         private void Subscribe()
         {
             _optimizer = new Optimizer.FrixelOptimizer();
@@ -109,6 +104,27 @@ namespace Frixel.UI
             _bw.WorkerSupportsCancellation = true;
             _bw.RunWorkerCompleted += _bw_RunWorkerCompleted;
         }
+
+        private void Unsubscribe()
+        {
+            _optimizer.RanIteration -= _optimizer_RanIteration;
+            _bw.DoWork -= _bw_DoWork;
+            _bw.RunWorkerCompleted -= _bw_RunWorkerCompleted;
+        }
+
+        #endregion
+
+        #region Overrides
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            Unsubscribe();
+        }
+
+        #endregion
+
+        #region Background Worker
 
         private void _bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -123,6 +139,10 @@ namespace Frixel.UI
                 _bwComplete = true;
             }
         }
+
+        #endregion
+
+        #region Optimizer
 
         private void _optimizer_RanIteration(object sender, EventArgs e)
         {
@@ -153,12 +173,9 @@ namespace Frixel.UI
             }
         }
 
-        private void Unsubscribe()
-        {
-            _optimizer.RanIteration -= _optimizer_RanIteration;
-            _bw.DoWork -= _bw_DoWork;
-            _bw.RunWorkerCompleted -= _bw_RunWorkerCompleted;
-        }
+        #endregion
+
+        #region UI Effects
 
         public void ShowWindow()
         {
@@ -258,21 +275,14 @@ namespace Frixel.UI
             this.grd_FrixelSplash.Visibility = Visibility.Hidden;
         }
 
-        private double GridSize(double sliderValue)
-        {
-            // Slider domain is always 0 to 1.
-            // Map the value to our domain of Slidermin to SliderMax
-            return sliderValue.MapRound(_sliderMappingDomains.Item1, _sliderMappingDomains.Item2);
-        }
-
-        private void DrawGridSize()
-        {
-            this.tb_GridSize.Text = _xGridSize + "', " + _yGridSize + "'";
-            this.tb_gridX.Text = _xGridSize + "'";
-            this.tb_gridY.Text = _yGridSize + "'";
-        }
+        #endregion
 
         #region Events
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Redraw();
+        }
 
         private void btn_RefGeo_Click(object sender, RoutedEventArgs e)
         {
@@ -315,8 +325,74 @@ namespace Frixel.UI
             tb_GravLoad.Text = Math.Round(sld_GravLoad.Value.Map(new Domain(0, 1), new Domain(0, 10))).ToString();
         }
 
+        private void btn_Run_Click(object sender, RoutedEventArgs e)
+        {
+            AnalyzeAndRedraw();
+        }
+
+        private void btn_Reset_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.AnalysisResults = null;
+            var update = UpdateRhino(_xGridSize, _yGridSize);
+            SetUpdated(update);
+            Redraw();
+        }
+
+        private void btn_BraceAll_Click(object sender, RoutedEventArgs e)
+        {
+            BraceAll();
+        }
+
+        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
+
+        private void tb_Close_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            this.Close();
+        }
+
+        private void btn_Optimize_Click(object sender, RoutedEventArgs e)
+        {
+            if (_bw.IsBusy)
+            {
+                _bw.CancelAsync();
+                this.btn_Optimize.Content = "Optimize";
+                _bwComplete = true;
+            }
+            else
+            {
+                // First analye
+                AnalyzeAndRedraw();
+                tb_Generations.Text = "";
+                _completeGens = 0;
+                _bwComplete = false;
+                _bw.RunWorkerAsync();
+                this.btn_Optimize.Content = "Optimize";
+            }
+        }
+
+        private void btn_Save_Click(object sender, RoutedEventArgs e)
+        {
+            // Run the bake to rhino command
+        }
 
         #endregion
+
+        private double GridSize(double sliderValue)
+        {
+            // Slider domain is always 0 to 1.
+            // Map the value to our domain of Slidermin to SliderMax
+            return sliderValue.MapRound(_sliderMappingDomains.Item1, _sliderMappingDomains.Item2);
+        }
+
+        private void DrawGridSize()
+        {
+            this.tb_GridSize.Text = _xGridSize + "', " + _yGridSize + "'";
+            this.tb_gridX.Text = _xGridSize + "'";
+            this.tb_gridY.Text = _yGridSize + "'";
+        }
 
         private void SetUpdated(FrixelReferenceData refData)
         {
@@ -429,16 +505,6 @@ namespace Frixel.UI
             this.canv_Main.Children.Clear();
         }
 
-        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Redraw();
-        }
-
-        private void btn_Run_Click(object sender, RoutedEventArgs e)
-        {
-            AnalyzeAndRedraw();
-        }
-
         private void AnalyzeAndRedraw()
         {
             // Return if fucked
@@ -501,53 +567,10 @@ namespace Frixel.UI
             Redraw(true);
         }
 
-        private void btn_Reset_Click(object sender, RoutedEventArgs e)
-        {
-            MainWindow.AnalysisResults = null;
-            var update = UpdateRhino(_xGridSize, _yGridSize);
-            SetUpdated(update);
-            Redraw();
-        }
-
-        private void btn_BraceAll_Click(object sender, RoutedEventArgs e)
-        {
-            BraceAll();
-        }
-
         private void BraceAll()
         {
             this._pixelStructure.Pixels.ForEach(p => p.ChangeStateTo(PixelState.Moment));
             Redraw();
         }
-
-        private void Grid_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            DragMove();
-        }
-
-        private void tb_Close_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            this.Close();
-        }
-
-        private void btn_Optimize_Click(object sender, RoutedEventArgs e)
-        {
-            if (_bw.IsBusy)
-            {
-                _bw.CancelAsync();
-                this.btn_Optimize.Content = "Optimize";
-                _bwComplete = true;
-            } else
-            {
-                // First analye
-                AnalyzeAndRedraw();
-                tb_Generations.Text = "";
-                _completeGens = 0;
-                _bwComplete = false;
-                _bw.RunWorkerAsync();
-                this.btn_Optimize.Content = "Optimize";
-            }
-        }
-
     }
 }
