@@ -64,16 +64,6 @@ namespace Frixel.Rhinoceros
             return false;
         }
 
-        public static double Distance(Point3f a, Point3f b)
-        {
-            return Math.Sqrt(Math.Pow((a.X - b.X), 2) + Math.Pow((a.Y - b.Y), 2) + Math.Pow((a.Z - b.Z), 2));
-        }
-
-        public static double Distance(Point3d a, Point3d b)
-        {
-            return Math.Sqrt(Math.Pow((a.X - b.X), 2) + Math.Pow((a.Y - b.Y), 2) + Math.Pow((a.Z - b.Z), 2));
-        }
-
         public static double Distance(double[] a, int[] b)
         {
             return Math.Sqrt(Math.Pow((a[0] + b[0]), 2) + Math.Pow((a[1] + b[1]), 2) + Math.Pow((a[2] + b[2]), 2));

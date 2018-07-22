@@ -46,5 +46,10 @@ namespace Frixel.UI
                  System.Convert.ToByte(color.B)
                 );
         }
+
+        public static Point2d ToPoint2d(this System.Windows.Point point)
+        {
+            return new Point2d(point.X, point.Y);
+        }
     }
 }

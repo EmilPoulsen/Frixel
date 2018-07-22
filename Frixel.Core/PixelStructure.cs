@@ -118,5 +118,55 @@ namespace Frixel.Core
                 this.DispNodes[i].Y = this.Nodes[i].Y;
             }
         }
+
+        /// <summary>
+        /// Returns true if successful
+        /// </summary>
+        /// <returns></returns>
+        public bool ChangeBracingAtLocation(Point2d location, bool useAnalytical)
+        {            
+            // Switch node collection based on analytical view
+            List<Point2d> MyNodes = this.Nodes;
+            if (useAnalytical) { MyNodes = this.DispNodes; }
+
+            // Check if location is within the domain of the points
+            if (location.X < MyNodes.Select(p => p.X).Min()
+             | location.Y < MyNodes.Select(p => p.Y).Min()
+             | location.X > MyNodes.Select(p => p.X).Max()
+             | location.Y > MyNodes.Select(p => p.Y).Max()
+             ) { return false; }
+
+            // Find closest node to point
+            var closestNode = location.FindClosest(MyNodes);
+            var closestNodeIndex = MyNodes.IndexOf(closestNode);
+
+            // See what side the point is relative to the node
+            bool above = location.Y > closestNode.Y;
+            bool left = location.X < closestNode.X;
+
+            // Find the relevant pixel  
+            // Bottom Right
+            if(above && left)
+            {
+                this.Pixels.Where(p => p.BottomRight == closestNodeIndex).First().FlipState();
+            }
+            // Bottom Left
+            else if (above && !left)
+            {
+                this.Pixels.Where(p => p.BottomLeft == closestNodeIndex).First().FlipState();
+            }
+            // Top Left
+            else if (!above && !left)
+            {
+                this.Pixels.Where(p => p.TopLeft == closestNodeIndex).First().FlipState();
+            }
+            // Top right
+            else
+            {
+                this.Pixels.Where(p => p.TopRight == closestNodeIndex).First().FlipState();
+            }
+
+            return true;
+        }
     }
 }

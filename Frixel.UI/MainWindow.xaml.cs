@@ -45,7 +45,7 @@ namespace Frixel.UI
         public static event PixelStructureUpdate UpdateClient;
 
         public delegate void PixelStructureBake(PixelStructure pixelStructure);
-        public static event PixelStructureBake BakeStructure;   
+        public static event PixelStructureBake BakeStructure;
 
         private double _xGridSize;
         private double _yGridSize;
@@ -167,7 +167,7 @@ namespace Frixel.UI
         private void UpdateBracing()
         {
             var shouldbebraced = MainWindow.AnalysisResults.PixelResults.Select(p => p.Value.IsBraced).ToList();
-            for(int i = 0; i<this._pixelStructure.Pixels.Count; i++)
+            for (int i = 0; i < this._pixelStructure.Pixels.Count; i++)
             {
                 if (shouldbebraced[i])
                 {
@@ -289,8 +289,8 @@ namespace Frixel.UI
 
         private void btn_RefGeo_Click(object sender, RoutedEventArgs e)
         {
-            var refData = ReferenceFromClient(_xGridSize,_yGridSize);
-            if(refData == null) { return; }
+            var refData = ReferenceFromClient(_xGridSize, _yGridSize);
+            if (refData == null) { return; }
 
             SetUpdated(refData);
             this.Redraw();
@@ -323,7 +323,7 @@ namespace Frixel.UI
 
         private void sld_GravLoad_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if(AnalysisResults == null) { return; }
+            if (AnalysisResults == null) { return; }
             Redisplace();
             tb_GravLoad.Text = Math.Round(sld_GravLoad.Value.Map(new Domain(0, 1), new Domain(0, 10))).ToString();
         }
@@ -400,10 +400,37 @@ namespace Frixel.UI
 
         private void SetUpdated(FrixelReferenceData refData)
         {
-            if(refData == null) { return; }
+            if (refData == null) { return; }
             this._pixelStructure = refData.Structure;
             this._actualOutline = refData.ActualShape;
             this._massingDomain = refData.BoundingBox;
+        }
+
+        private Domain2d GetCanvasDomain()
+        {
+            // Get canvas properties
+            var canvasWidth = this.canv_Main.ActualWidth;
+            var canvasHeight = this.canv_Main.ActualHeight; // Test height
+
+            // Get canvas ready lines
+            var canvasDomain = new Domain2d(
+                new Domain(0 + CanvasMargin, canvasWidth - CanvasMargin),
+                new Domain(canvasHeight - CanvasMargin, 0 + CanvasMargin)
+                );
+
+            // Scale the canvas domain to the aspect ratio of the input domain
+            if (_massingDomain.X.IsLargerThan(_massingDomain.Y))
+            {
+                double YscaleFactor = _massingDomain.AspectRatioY;
+                canvasDomain.Y.ScaleMid(YscaleFactor);
+            }
+            else
+            {
+                double XscaleFactor = _massingDomain.AspectRatioX;
+                canvasDomain.Y.ScaleMid(XscaleFactor);
+            }
+
+            return canvasDomain;
         }
 
         private void Redraw(bool renderDisp = false)
@@ -418,30 +445,10 @@ namespace Frixel.UI
             if (CanvasIsSmall()) { return; }
             if (this._pixelStructure == null | this._actualOutline == null) { return; }
 
-            // Get canvas properties
-            var canvasWidth = this.canv_Main.ActualWidth;
-            var canvasHeight = this.canv_Main.ActualHeight; // Test height
-
-            // Get domain of our collection of points in x and Y
-            //Domain2d pxlSDomain = _pixelStructure.Nodes.GetBoundingBox();
+            // Get domains for canvas and point collection
             Domain2d pxlSDomain = this._massingDomain;
+            Domain2d canvasDomain = GetCanvasDomain();
 
-            // Get canvas ready lines
-            var canvasDomain = new Domain2d(
-                new Domain(0 + CanvasMargin, canvasWidth - CanvasMargin),
-                new Domain(canvasHeight - CanvasMargin, 0 + CanvasMargin)
-                );
-            // Scale the canvas domain to the aspect ratio of the input domain
-            if (_massingDomain.X.IsLargerThan(_massingDomain.Y))
-            {
-                double YscaleFactor = _massingDomain.AspectRatioY;
-                canvasDomain.Y.ScaleMid(YscaleFactor);
-            }
-            else
-            {
-                double XscaleFactor = _massingDomain.AspectRatioX;
-                canvasDomain.Y.ScaleMid(XscaleFactor);
-            }
             List<Line> pxsLines = _pixelStructure.GetAllLines(renderDisp).Select(l =>
             {
                 return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Gray);
@@ -474,9 +481,9 @@ namespace Frixel.UI
                     } catch
                     {
                         l.Stroke = Brushes.Black;
-                        _pixelStructure.AllEdgeColors.Add(new Core.Display.Color(255,0,0,0));
+                        _pixelStructure.AllEdgeColors.Add(new Core.Display.Color(255, 0, 0, 0));
                     }
-     
+
                     i++;
                 });
             }
@@ -518,7 +525,7 @@ namespace Frixel.UI
         private void AnalyzeAndRedraw()
         {
             // Return if fucked
-            if(_pixelStructure == null) { return; }
+            if (_pixelStructure == null) { return; }
             // Set stuff
             _pixelStructure.GravityLoad.Activated = true;
             _pixelStructure.GravityLoad.Amplification = 5000;
@@ -558,7 +565,7 @@ namespace Frixel.UI
 
                 }
                 HideWarningMessage();
-                if(MainWindow.AnalysisResults == null) { return; }
+                if (MainWindow.AnalysisResults == null) { return; }
                 lb_Results.Items.Clear();
                 MainWindow.AnalysisResults.NodeResults.Select(r => r.Value.DispX.ToString() + "," + r.Value.DispY.ToString()).ToList().ForEach(r => lb_Results.Items.Add(r));
             }
@@ -582,5 +589,28 @@ namespace Frixel.UI
             this._pixelStructure.Pixels.ForEach(p => p.ChangeStateTo(PixelState.Moment));
             Redraw();
         }
+
+        private void canv_Main_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // Get the pixel space coordinates of the click
+            var location = ScreenSpaceToPixelSpace(e.GetPosition(canv_Main));
+            if(MainWindow.AnalysisResults != null) // LJ Need to have state saved showing whether analytical or regular is being viewed
+            {
+                // If there's a change, then redraw
+                if (this._pixelStructure.ChangeBracingAtLocation(location, true)) Redraw(true);
+            } else
+            {
+                // If there's a change, then redraw
+                if (this._pixelStructure.ChangeBracingAtLocation(location, false)) Redraw();
+            }
+        }
+
+        private Point2d ScreenSpaceToPixelSpace(Point clickLocation)
+        {
+            Domain2d canvasDomain = GetCanvasDomain();
+            var mappedPoint = clickLocation.ToPoint2d().Map(canvasDomain, this._massingDomain);
+            return mappedPoint;            
+        }
+
     }
 }

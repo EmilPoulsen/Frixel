@@ -26,5 +26,17 @@ namespace Frixel.Core.Geometry
             return new Point2d(this.X.Map(from.X, to.X),
                             this.Y.Map(from.Y, to.Y));
         }
+
+        public Point2d FindClosest(List<Point2d> cloud)
+        {
+            // Create a matching list with distance
+            var pByDist = cloud.Select(p => new Tuple<double, Point2d>(p.DistanceTo(this), p)).OrderBy(p => p.Item1);
+            return pByDist.First().Item2;
+        }
+
+        public double DistanceTo(Point2d b)
+        {
+            return Math.Sqrt(Math.Pow((this.X - b.X), 2) + Math.Pow((this.Y - b.Y), 2));
+        }
     }
 }

@@ -12,6 +12,7 @@ namespace Frixel.Core {
         public int TopRight { get; private set; }
         public int BottomRight { get; private set; }
         public int BottomLeft { get; private set; }
+        public bool LockedBrace { get; set; } = false;
 
         public Pixel(int topLeft, int topRight, int botLeft, int botRight, PixelState state) {
             this.TopLeft = topLeft;
@@ -58,8 +59,6 @@ namespace Frixel.Core {
             return edgeList;
         }
 
-        public bool LockedBrace { get; set; }
-
         public bool ContainsNode(int nodeIndex, bool oneSideOnly = false)
         {
             if (oneSideOnly)
@@ -84,6 +83,24 @@ namespace Frixel.Core {
         public void ChangeStateTo(PixelState state)
         {
             this.State = state;
+        }
+
+        public void FlipState()
+        {
+            if (this.State != PixelState.None)
+            {
+                this.ClearState();
+            }
+            else
+            {
+                this.ChangeStateTo(PixelState.Moment);
+            }
+        }
+
+        public void ClearState()
+        {
+            this.ChangeStateTo(PixelState.None);
+            this.LockedBrace = false;
         }
 
     }

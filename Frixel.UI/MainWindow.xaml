@@ -18,7 +18,7 @@
             <ColumnDefinition Width="165"/>
             <ColumnDefinition Width="152"/>
         </Grid.ColumnDefinitions>
-        <Canvas x:Name="canv_Main" Background="#FFECECEC" Grid.RowSpan="4" Margin="0,20,0,0"/>
+        <Canvas x:Name="canv_Main" Background="#FFECECEC" Grid.RowSpan="4" Margin="0,20,0,0" MouseDown="canv_Main_MouseDown"/>
         <Button x:Name="btn_RefGeo" Click="btn_RefGeo_Click" Content="Reference" Grid.Column="1" Margin="10,7,10,60" Background="#FFE4FF9C" FontWeight="Bold" Grid.Row="1" BorderBrush="#FFA8A8A8"/>
         <Slider x:Name="sld_GridX" ValueChanged="sld_GridX_ValueChanged" Grid.Column="1" Margin="54,0,37,26" RenderTransformOrigin="0.379,0.13" Maximum="1" LargeChange="0.25" SmallChange="0.05" Height="18" VerticalAlignment="Bottom" Grid.Row="1"/>
         <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,28" TextWrapping="Wrap" Text="Grid X" FontStyle="Italic" Width="39" Height="16" VerticalAlignment="Bottom" Grid.Row="1"/>
