@@ -5,7 +5,7 @@ Frixel is a finite element analysis program that’s so easy a 5 year old could 
 
 User Interface             |  Building analysis
 :-------------------------:|:-------------------------:
-![Alt Text](https://github.com/EmilPoulsen/Frixel/blob/master/doc/Frixel_A.gif)  |  ![Alt Text](https://github.com/EmilPoulsen/Frixel/blob/master/doc/Frixel_A.gif)
+![Alt Text](https://github.com/EmilPoulsen/Frixel/blob/master/doc/Frixel_GUI_Zoom.png)  |  ![Alt Text](https://github.com/EmilPoulsen/Frixel/blob/master/doc/Frixel_A.gif)
 **Cantilever analysis** | **Optimization**
 ![Alt Text](https://github.com/EmilPoulsen/Frixel/blob/master/doc/Frixel_C.gif)  |  ![Alt Text](https://github.com/EmilPoulsen/Frixel/blob/master/doc/Frixel_B.gif)
 
