@@ -41,13 +41,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Display.cs" />
     <Compile Include="Domain.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GeometryExtensions.cs" />
     <Compile Include="Geometry\Line2d.cs" />
     <Compile Include="Geometry\Point2d.cs" />
+    <Compile Include="MassingStructure.cs" />
     <Compile Include="ModelCreator.cs" />
     <Compile Include="Pixel.cs" />
+    <Compile Include="PixelStructure.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Test\TestObjects.cs" />
   </ItemGroup>

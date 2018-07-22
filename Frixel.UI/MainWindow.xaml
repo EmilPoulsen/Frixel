@@ -39,9 +39,9 @@
                 <ColumnDefinition Width="64*"/>
             </Grid.ColumnDefinitions>
             <Button x:Name="btn_Run" Content="Run" Margin="0,0,1,8" Grid.RowSpan="2" Background="#FFEDFFBD" Click="btn_Run_Click"/>
-            <Button x:Name="btn_Reset" Content="Reset" Margin="1,0,0,0" Grid.Column="1" Background="#FFF1F1F1" Grid.Row="1" Click="btn_Reset_Click"/>
-            <Button x:Name="btn_Save" Content="Save" Margin="1,1,0,6" Grid.Column="1" Grid.Row="2" Background="#FFE7EED7" Click="btn_Save_Click"/>
-            <Button x:Name="btn_BraceAll" Content="BraceAll" Margin="1,0,0,1" Grid.Column="1" Background="#FFFDEDFF" Click="btn_BraceAll_Click"/>
+            <Button x:Name="btn_Reset" Content="Reset" Margin="0,0,1,0" Grid.Column="1" Background="#FFF1F1F1" Grid.Row="1" Click="btn_Reset_Click"/>
+            <Button x:Name="btn_Save" Content="Save" Margin="0,1,1,6" Grid.Column="1" Grid.Row="2" Background="#FFFFD5F5" Click="btn_Save_Click"/>
+            <Button x:Name="btn_BraceAll" Content="BraceAll" Margin="0,0,1,1" Grid.Column="1" Background="#FFFDEDFF" Click="btn_BraceAll_Click"/>
             <Button x:Name="btn_Optimize" Content="Optimize" Margin="0,16,1,6" Grid.RowSpan="2" Background="#FFBDFFC9" Click="btn_Optimize_Click" Grid.Row="1"/>
         </Grid>
         <TextBlock x:Name="tb_GridSize" TextWrapping="Wrap" Text="gridsize" Margin="5,0,0,3" Height="16" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="82" Grid.Row="3"/>
@@ -99,7 +99,7 @@
                 </LinearGradientBrush>
             </Grid.Background>
             <TextBlock HorizontalAlignment="Left" Margin="6,2,0,3" TextWrapping="Wrap" Text="Frixel" Width="31" Foreground="White"/>
-            <TextBlock x:Name="tb_Close" HorizontalAlignment="Left" Margin="602,0,0,5" TextWrapping="Wrap" Text="x" Width="9" Foreground="White" MouseDown="tb_Close_MouseDown"/>
+            <TextBlock x:Name="tb_Close" Margin="0,0,3,5" TextWrapping="Wrap" Text="x" Foreground="White" MouseDown="tb_Close_MouseDown" HorizontalAlignment="Right" Width="9"/>
             <TextBlock x:Name="tb_Generations" TextWrapping="Wrap" Margin="42,4,250,0" Foreground="#99FFFFFF" FontSize="9"/>
         </Grid>
     </Grid>

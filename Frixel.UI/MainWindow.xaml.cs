@@ -39,10 +39,13 @@ namespace Frixel.UI
         const double CanvasMargin = 60;
 
         public delegate FrixelReferenceData PixelStructurePass(double xSize, double ySize);
-        public static event PixelStructurePass ReferenceFromRhino;
+        public static event PixelStructurePass ReferenceFromClient;
 
         public delegate FrixelReferenceData PixelStructureUpdate(double xSize, double ySize);
-        public static event PixelStructureUpdate UpdateRhino;
+        public static event PixelStructureUpdate UpdateClient;
+
+        public delegate void PixelStructureBake(PixelStructure pixelStructure);
+        public static event PixelStructureBake BakeStructure;   
 
         private double _xGridSize;
         private double _yGridSize;
@@ -52,7 +55,7 @@ namespace Frixel.UI
         private Optimizer.FrixelOptimizer _optimizer;
 
         private PixelStructure _pixelStructure;
-        private List<Line2d> _actualMassingOutline;
+        private List<Line2d> _actualOutline;
         private Domain2d _massingDomain;
 
         public static AnalysisResults AnalysisResults;
@@ -286,7 +289,7 @@ namespace Frixel.UI
 
         private void btn_RefGeo_Click(object sender, RoutedEventArgs e)
         {
-            var refData = ReferenceFromRhino(_xGridSize,_yGridSize);
+            var refData = ReferenceFromClient(_xGridSize,_yGridSize);
             if(refData == null) { return; }
 
             SetUpdated(refData);
@@ -296,7 +299,7 @@ namespace Frixel.UI
         private void sld_GridX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             _xGridSize = GridSize(sld_GridX.Value);
-            var updated = UpdateRhino(_xGridSize, _yGridSize);
+            var updated = UpdateClient(_xGridSize, _yGridSize);
             SetUpdated(updated);
             this.Redraw();
             DrawGridSize();
@@ -305,7 +308,7 @@ namespace Frixel.UI
         private void sld_GridY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             _yGridSize = GridSize(sld_GridY.Value);
-            var updated = UpdateRhino(_xGridSize, _yGridSize);
+            var updated = UpdateClient(_xGridSize, _yGridSize);
             SetUpdated(updated);
             this.Redraw();
             DrawGridSize();
@@ -333,7 +336,7 @@ namespace Frixel.UI
         private void btn_Reset_Click(object sender, RoutedEventArgs e)
         {
             MainWindow.AnalysisResults = null;
-            var update = UpdateRhino(_xGridSize, _yGridSize);
+            var update = UpdateClient(_xGridSize, _yGridSize);
             SetUpdated(update);
             Redraw();
         }
@@ -375,7 +378,8 @@ namespace Frixel.UI
 
         private void btn_Save_Click(object sender, RoutedEventArgs e)
         {
-            // Run the bake to rhino command
+            // Emit event to client to bake with current structure
+            BakeStructure(this._pixelStructure);
         }
 
         #endregion
@@ -398,7 +402,7 @@ namespace Frixel.UI
         {
             if(refData == null) { return; }
             this._pixelStructure = refData.Structure;
-            this._actualMassingOutline = refData.ActualShape;
+            this._actualOutline = refData.ActualShape;
             this._massingDomain = refData.BoundingBox;
         }
 
@@ -412,7 +416,7 @@ namespace Frixel.UI
 
             // If canvas is too small fuck off
             if (CanvasIsSmall()) { return; }
-            if (this._pixelStructure == null | this._actualMassingOutline == null) { return; }
+            if (this._pixelStructure == null | this._actualOutline == null) { return; }
 
             // Get canvas properties
             var canvasWidth = this.canv_Main.ActualWidth;
@@ -438,7 +442,7 @@ namespace Frixel.UI
                 double XscaleFactor = _massingDomain.AspectRatioX;
                 canvasDomain.Y.ScaleMid(XscaleFactor);
             }
-            List<Line> pxsLines = _pixelStructure.GetAllLInes(renderDisp).Select(l =>
+            List<Line> pxsLines = _pixelStructure.GetAllLines(renderDisp).Select(l =>
             {
                 return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Gray);
             }).ToList();
@@ -457,21 +461,27 @@ namespace Frixel.UI
                     );
                 var redDomain = new Domain(0, 255);
                 int i = 0;
+                _pixelStructure.ClearAllEdgeColors();
                 pxsLines.ForEach(l =>
                 {
                     try
                     {
-                        l.Stroke = new SolidColorBrush(Color.FromArgb(255, System.Convert.ToByte(edgeMap[i].Map(startingDomain, redDomain)), 0, 0));
+                        var edgeColor = new Core.Display.Color(255, System.Convert.ToInt32(edgeMap[i].Map(startingDomain, redDomain)), 0, 0);
+                        _pixelStructure.AllEdgeColors.Add(edgeColor);
+                        l.Stroke = new SolidColorBrush(edgeColor.ToMediaColor());
+                        // Add color to our pixel structure for baking and other purposes
+
                     } catch
                     {
                         l.Stroke = Brushes.Black;
+                        _pixelStructure.AllEdgeColors.Add(new Core.Display.Color(255,0,0,0));
                     }
      
                     i++;
                 });
             }
 
-            List<Line> actualMassingLInes = _actualMassingOutline.Select(l =>
+            List<Line> actualMassingLInes = _actualOutline.Select(l =>
             {
                 return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.LightBlue);
             }).ToList();

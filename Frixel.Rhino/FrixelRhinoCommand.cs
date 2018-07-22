@@ -15,6 +15,8 @@ namespace Frixel.Rhinoceros
 {
     public class FrixelRhinoCommand : Command
     {
+        #region Members
+
         private bool _handlerIsAttached = false;
         private Frixel.UI.MainWindow _window;
         private RhinoDoc _doc;
@@ -23,6 +25,8 @@ namespace Frixel.Rhinoceros
         private double _ySize;
         private Curve _lastReffedCurve;
         private Tuple<Point3d, Point3d> _spine;
+
+        #endregion
 
         public FrixelRhinoCommand()
         {
@@ -68,7 +72,7 @@ namespace Frixel.Rhinoceros
             return new Tuple<Point3d, Point3d>(pt0, pt1);
         }
 
-        private UI.FrixelReferenceData Regenerate()
+        private MassingStructure GenerateMassingStructure()
         {
             // Generate an array of points
             var bb = _lastReffedCurve.GetBoundingBox(true);
@@ -88,9 +92,6 @@ namespace Frixel.Rhinoceros
             var yDim = corns[0].DistanceTo(corns[3]);
             var startCorner = corns[0];
 
-            // TEST
-            //bb.GetCorners().ToList().ForEach(p => _doc.Objects.AddPoint(p));
-
             // Create a 2d domain bbox 
             Core.Domain2d Boundingbox = new Domain2d(new Core.Domain(corns[0].X, corns[1].X), new Core.Domain(corns[0].Y, corns[3].Y));
 
@@ -98,8 +99,8 @@ namespace Frixel.Rhinoceros
             if (_xSize * 2 > xDim | _ySize * 2 > yDim) { return null; }
 
             // Get the dimensions of the massing bbox
-            var xNumber = Math.Ceiling(xDim / _xSize);
-            var yNumber = Math.Ceiling(yDim / _ySize);
+            var xNumber = System.Convert.ToInt32(Math.Ceiling(xDim / _xSize));
+            var yNumber = System.Convert.ToInt32(Math.Ceiling(yDim / _ySize));
             var xSpacing = xDim / xNumber;
             var ySpacing = yDim / yNumber;
 
@@ -107,29 +108,57 @@ namespace Frixel.Rhinoceros
             List<Point3d> nodePoints = new List<Point3d>();
 
             // Generate a point array
-            Dictionary<Tuple<int, int>, Core.Geometry.Point2d> nodeDictionary = new Dictionary<Tuple<int, int>, Core.Geometry.Point2d>();
+            Dictionary<Tuple<int, int>, Core.Geometry.Point2d> Nodes = new Dictionary<Tuple<int, int>, Core.Geometry.Point2d>();
             for (int x = 0; x <= xNumber; x++)
             {
                 for (int y = 0; y <= yNumber; y++)
                 {
                     var p = new Point3d((x * xSpacing) + startCorner.X, (y * ySpacing) + startCorner.Y, 0);
                     nodePoints.Add(p);
-                    nodeDictionary.Add(
+                    Nodes.Add(
                         new Tuple<int, int>(x, y),
                         p.ToFrixelPoint(Utilities.PointIsInsideOrOnCurve(_lastReffedCurve, p, 0.01)));
                     if (Utilities.PointIsInsideOrOnCurve(_lastReffedCurve, p, 0.01)) { nodePointTests.Add(p); }
                 }
             }
 
-            // Crawl across the point array and crete pixels
-            var nodeList = nodeDictionary.Values.ToList();
-            List<Pixel> pixelList = new List<Pixel>();
-            for (int x = 0; x < xNumber; x++)
+            // Get the line representation of our massing
+            List<Core.Geometry.Line2d> massingLines = new List<Core.Geometry.Line2d>();
+            var pline = _lastReffedCurve.ToPolyline(0.01, Math.PI, 1, 1);
+            var plinePoints = pline.ToPolyline().ToArray();
+            for (int i = 0; i < plinePoints.Count() - 1; i++)
             {
-                for (int y = 0; y < yNumber; y++)
+                massingLines.Add(new Core.Geometry.Line2d(plinePoints[i].ToFrixelPoint(),
+                                                          plinePoints[i + 1].ToFrixelPoint())
+                );
+            }
+
+
+            return new MassingStructure() { Nodes = Nodes,
+                                            xSpacing = xSpacing,
+                                            ySpacing = ySpacing,
+                                            xBayCount = xNumber,
+                                            yBayCount = yNumber,
+                                            BoundingBox = Boundingbox,
+                                            Outline = massingLines};
+        }
+
+        private UI.FrixelReferenceData Regenerate()
+        {
+            MassingStructure massing = GenerateMassingStructure();
+            if(massing == null) { return null; }
+
+            var Nodes = massing.Nodes;
+
+            // Crawl across the point array and crete pixels
+            var nodeList = Nodes.Values.ToList();
+            List<Pixel> pixelList = new List<Pixel>();
+            for (int x = 0; x < massing.xBayCount; x++)
+            {
+                for (int y = 0; y < massing.yBayCount; y++)
                 {
-                    if (!nodeDictionary.ContainsKey(new Tuple<int, int>(x, y))) continue;
-                    var currentPoint = nodeDictionary[new Tuple<int, int>(x, y)];
+                    if (!Nodes.ContainsKey(new Tuple<int, int>(x, y))) continue;
+                    var currentPoint = Nodes[new Tuple<int, int>(x, y)];
                     var topLeft = new Tuple<int, int>(x, y + 1);
                     var topRight = new Tuple<int, int>(x + 1, y + 1);
                     var botLeft = new Tuple<int, int>(x, y);
@@ -140,10 +169,10 @@ namespace Frixel.Rhinoceros
                     Core.Geometry.Point2d botRightPt;
 
                     if (
-                        nodeDictionary.TryGetValue(botLeft, out botLeftPt) &&
-                        nodeDictionary.TryGetValue(topLeft, out topLeftPt) &&
-                        nodeDictionary.TryGetValue(topRight, out topRightPt) &&
-                        nodeDictionary.TryGetValue(botRight, out botRightPt) &&
+                        Nodes.TryGetValue(botLeft, out botLeftPt) &&
+                        Nodes.TryGetValue(topLeft, out topLeftPt) &&
+                        Nodes.TryGetValue(topRight, out topRightPt) &&
+                        Nodes.TryGetValue(botRight, out botRightPt) &&
                         Utilities.AtLeastXInside(topLeftPt.IsInside, topRightPt.IsInside, botLeftPt.IsInside, botRightPt.IsInside, 2)
                         )
                     {
@@ -197,13 +226,13 @@ namespace Frixel.Rhinoceros
                 spi++;
             }
             var closestNode = nodeList[closestPoint.Item2];
-            var coord = nodeDictionary.Where(x => x.Value == closestNode).First().Key;
+            var coord = Nodes.Where(x => x.Value == closestNode).First().Key;
 
             // Find orientation of spine curve, vert or horz, to create spine
             bool xDir = Math.Abs(_spine.Item1.X - _spine.Item2.X) > Math.Abs(_spine.Item1.Y - _spine.Item2.Y);
             if (xDir)
             {
-                var horzPts = nodeDictionary.Where(x => x.Key.Item2 == coord.Item2).ToList().Select(x => x.Value).ToList();
+                var horzPts = Nodes.Where(x => x.Key.Item2 == coord.Item2).ToList().Select(x => x.Value).ToList();
                 List<Core.Geometry.Point2d> newPts = new List<Core.Geometry.Point2d>();
                 foreach (var pt in horzPts)
                 {
@@ -223,7 +252,7 @@ namespace Frixel.Rhinoceros
             }
             else
             {
-                var vertPts = nodeDictionary.Where(x => x.Key.Item1 == coord.Item1).ToList().Select(x => x.Value).ToList();
+                var vertPts = Nodes.Where(x => x.Key.Item1 == coord.Item1).ToList().Select(x => x.Value).ToList();
                 List<Core.Geometry.Point2d> newPts = new List<Core.Geometry.Point2d>();
                 foreach (var pt in vertPts)
                 {
@@ -254,22 +283,12 @@ namespace Frixel.Rhinoceros
             // Create the pixel structure
             var pixelStruct = new Core.PixelStructure(nodeList, pixelList);
 
-            // Get the line representation of our massing
-            List<Core.Geometry.Line2d> massingLines = new List<Core.Geometry.Line2d>();
-            var pline = _lastReffedCurve.ToPolyline(0.01, Math.PI, 1, 1);
-            var plinePoints = pline.ToPolyline().ToArray();
-            for (int i = 0; i < plinePoints.Count() - 1; i++)
-            {
-                massingLines.Add(new Core.Geometry.Line2d(plinePoints[i].ToFrixelPoint(),
-                                                          plinePoints[i + 1].ToFrixelPoint())
-                );
-            }
 
             // Return the data
-            return new UI.FrixelReferenceData(pixelStruct, massingLines, Boundingbox);
+            return new UI.FrixelReferenceData(pixelStruct, massing.Outline, massing.BoundingBox);
         }
 
-        private UI.FrixelReferenceData MainWindow_ReferenceFromRhino(double xSize, double ySize)
+        private UI.FrixelReferenceData MainWindow_ReferenceFromClient(double xSize, double ySize)
         {
             // Tell user to select objects from doc
             var go = new GetObject();
@@ -343,8 +362,9 @@ namespace Frixel.Rhinoceros
             #endregion
 
             if (!_handlerIsAttached) {
-                Frixel.UI.MainWindow.ReferenceFromRhino += MainWindow_ReferenceFromRhino;
-                Frixel.UI.MainWindow.UpdateRhino += MainWindow_UpdateRhino;
+                Frixel.UI.MainWindow.ReferenceFromClient += MainWindow_ReferenceFromClient;
+                Frixel.UI.MainWindow.UpdateClient += MainWindow_UpdateClient;
+                Frixel.UI.MainWindow.BakeStructure += MainWindow_BakeStructure;
                 _handlerIsAttached = true;
             }
 
@@ -362,16 +382,77 @@ namespace Frixel.Rhinoceros
             return Result.Success;
         }
 
+        private void MainWindow_BakeStructure(PixelStructure pixelStructure)
+        {
+            // Bake designed structure
+            var rhLines = pixelStructure.GetAllEdges().Select(e =>
+            {
+                return new Rhino.Geometry.Line(pixelStructure.Nodes[e.Start].ToRhinoPoint(),
+                                               pixelStructure.Nodes[e.End].ToRhinoPoint());
+            }).ToList();
+            var attr = SetUpAttr("Designed_Structure", System.Drawing.Color.White);
+                
+            rhLines.ForEach(l => Rhino.RhinoDoc.ActiveDoc.Objects.Add(l.ToNurbsCurve(),attr));
+
+            // Bake analytical curves with their colors
+            if(pixelStructure.AllEdgeColors == null) { return; }
+            var rhAnalyticalLines = pixelStructure.GetAllLines(true).Select(l =>
+                 new Rhino.Geometry.Line(l.Start.ToRhinoPoint(), l.End.ToRhinoPoint())
+            ).ToList();
+            var analBaseAttr = SetUpAttr("Analyzed_Structure", System.Drawing.Color.Gray);
+            var analAttrs = pixelStructure.AllEdgeColors.Select(c =>
+            {
+                return new ObjectAttributes()
+                {
+                    LayerIndex = analBaseAttr.LayerIndex,
+                    ObjectColor = System.Drawing.Color.FromArgb(
+                           System.Convert.ToByte(c.A),
+                           System.Convert.ToByte(c.R),
+                           System.Convert.ToByte(c.G),
+                           System.Convert.ToByte(c.B)
+                    ),
+                    ObjectId = new Guid()
+                };
+            }).ToList();
+            for (int i = 0; i < rhAnalyticalLines.Count; i++)
+            {
+                RhinoDoc.ActiveDoc.Objects.Add(rhAnalyticalLines[i].ToNurbsCurve(), analAttrs[i]);
+            }
+            RhinoDoc.ActiveDoc.Views.Redraw();
+        }
+
         private void _window_Closed(object sender, EventArgs e)
         {
             this._window = null;
         }
 
-        private UI.FrixelReferenceData MainWindow_UpdateRhino(double xSize, double ySize)
+        private UI.FrixelReferenceData MainWindow_UpdateClient(double xSize, double ySize)
         {
             this._xSize = xSize;
             this._ySize = ySize;
             return this.Regenerate();
+        }
+
+        /// <summary>
+        /// Sets up object attributes and adds layer to doc if necessary
+        /// </summary>
+        /// <param name="layerName"></param>
+        /// <param name="layerColor"></param>
+        /// <returns></returns>
+        private ObjectAttributes SetUpAttr(string layerName, System.Drawing.Color layerColor)
+        {
+            var attr = new ObjectAttributes();
+            var bakeLayer = Rhino.RhinoDoc.ActiveDoc.Layers.FindName(layerName);
+            if (bakeLayer == null)
+            {
+                bakeLayer = new Layer();
+                bakeLayer.Name = layerName;
+                bakeLayer.Color = layerColor;
+                RhinoDoc.ActiveDoc.Layers.Add(bakeLayer);
+                bakeLayer = RhinoDoc.ActiveDoc.Layers.FindName(layerName);
+            }
+            attr.LayerIndex = bakeLayer.LayerIndex;
+            return attr;
         }
     }
 }

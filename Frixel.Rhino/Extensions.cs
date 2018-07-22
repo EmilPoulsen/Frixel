@@ -14,5 +14,10 @@ namespace Frixel.Rhinoceros.Extensions
             var p = new Point2d(point.X, point.Y) { IsInside = isInside };
             return p;
         }
+
+        public static Rhino.Geometry.Point3d ToRhinoPoint(this Point2d point, double z = 0)
+        {
+            return new Rhino.Geometry.Point3d(point.X, point.Y, z);
+        }
     }
 }

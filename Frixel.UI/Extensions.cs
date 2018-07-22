@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Frixel.Core.Extensions;
 using Frixel.Core.Geometry;
 using M = System.Windows.Media;
 
@@ -34,6 +35,16 @@ namespace Frixel.UI
                 0, 0);
             windowsRect.StrokeThickness = thickness;
             return windowsRect;
+        }
+
+        public static System.Windows.Media.Color ToMediaColor(this Core.Display.Color color)
+        {
+            return System.Windows.Media.Color.FromArgb(
+                 System.Convert.ToByte(color.A),
+                 System.Convert.ToByte(color.R),
+                 System.Convert.ToByte(color.G),
+                 System.Convert.ToByte(color.B)
+                );
         }
     }
 }
