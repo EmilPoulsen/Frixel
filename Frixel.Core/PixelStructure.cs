@@ -53,6 +53,15 @@ namespace Frixel.Core
         }
 
         /// <summary>
+        /// Returns true if this structure has analysis values
+        /// </summary>
+        /// <returns></returns>
+        public bool HasAnalysisValues()
+        {
+            return this.AllEdgeColors.Count != 0 && this.DispNodes.Count != 0;
+        }
+
+        /// <summary>
         /// Clears the collection of edge colors
         /// </summary>
         public void ClearAllEdgeColors()

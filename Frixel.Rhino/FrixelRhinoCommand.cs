@@ -395,7 +395,7 @@ namespace Frixel.Rhinoceros
             rhLines.ForEach(l => Rhino.RhinoDoc.ActiveDoc.Objects.Add(l.ToNurbsCurve(),attr));
 
             // Bake analytical curves with their colors
-            if(pixelStructure.AllEdgeColors == null) { return; }
+            if(!pixelStructure.HasAnalysisValues()) { return; }
             var rhAnalyticalLines = pixelStructure.GetAllLines(true).Select(l =>
                  new Rhino.Geometry.Line(l.Start.ToRhinoPoint(), l.End.ToRhinoPoint())
             ).ToList();
@@ -411,7 +411,8 @@ namespace Frixel.Rhinoceros
                            System.Convert.ToByte(c.G),
                            System.Convert.ToByte(c.B)
                     ),
-                    ObjectId = new Guid()
+                    ObjectId = new Guid(),
+                    ColorSource = ObjectColorSource.ColorFromObject
                 };
             }).ToList();
             for (int i = 0; i < rhAnalyticalLines.Count; i++)
