@@ -118,6 +118,7 @@ namespace Frixel.Core {
             if (obj.GetType() != typeof(Edge)) return false;
             var objEdge = obj as Edge;
             if (this.Start == objEdge.Start && this.End == objEdge.End) return true;
+            else if (this.End == objEdge.Start && this.Start == objEdge.End) return true;
             else return false;
         }
 

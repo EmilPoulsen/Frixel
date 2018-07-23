@@ -356,7 +356,7 @@ namespace Frixel.UI
             MainWindow.AnalysisResults = null;
             var update = UpdateClient(_xGridSize, _yGridSize);
             SetUpdated(update);
-            this.ChangeDisplayState(DisplayState.Default);
+            this.ChangeDisplayState(DisplayState.Default, true);
         }
 
         private void btn_BraceAll_Click(object sender, RoutedEventArgs e)
