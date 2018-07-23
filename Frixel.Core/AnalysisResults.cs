@@ -38,7 +38,7 @@ namespace Frixel.Core.Analysis
             }
             Elements = structure.Edges.Count;
             NetLength = structure.Edges.Select(e => structure.Nodes[e.Start].DistanceTo(structure.Nodes[e.End])).Sum();
-            IEnumerable<double> displacements = results.NodeResults.Values.Select(n => Math.Sqrt(Math.Pow(n.DispX, 2) + Math.Pow(n.DispY, 2)));
+            IEnumerable<double> displacements = results.NodeResults.Values.Select(n => Math.Sqrt(Math.Pow(n.DispX, 2) + Math.Pow(n.DispY, 2))).Where(x => x != 0);
             MaxDisplacement = displacements.Max();
             MinDisplacement = displacements.Min();
         }

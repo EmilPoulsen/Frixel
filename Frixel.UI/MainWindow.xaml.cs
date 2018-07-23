@@ -584,7 +584,6 @@ namespace Frixel.UI
             {
                 RenderAnalysisSummary();
             }
-            else { }
 
             // Set state
             this._isRedrawing = false;
@@ -592,10 +591,7 @@ namespace Frixel.UI
 
         private void RenderAnalysisSummary()
         {
-            if(this._analysisSummary == null)
-            {
-                this._analysisSummary = new AnalysisSummary(MainWindow.AnalysisResults, this._pixelStructure);
-            }
+            this._analysisSummary = new AnalysisSummary(MainWindow.AnalysisResults, this._pixelStructure);
             tb_DispMin.Text = "Displacement Min: " + _analysisSummary.MinDisplacement.RoundTo(2);
             tb_DispMax.Text = "Displacement Max: " + _analysisSummary.MaxDisplacement.RoundTo(2);
             tb_ElementCt.Text = "Elements: " + _analysisSummary.Elements;
