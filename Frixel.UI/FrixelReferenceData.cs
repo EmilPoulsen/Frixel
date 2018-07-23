@@ -13,15 +13,21 @@ namespace Frixel.UI
     /// </summary>
     public class FrixelReferenceData
     {
-        public PixelStructure Structure;
-        public List<Line2d> ActualShape;
-        public Domain2d BoundingBox;
+        public readonly PixelStructure Structure;
+        public readonly MassingStructure MassingStructure;
+        public readonly List<Line2d> ActualShape;
+        public readonly Domain2d BoundingBox;
+        public readonly double ActualXSize;
+        public readonly double ActuveYSize;
 
-        public FrixelReferenceData(PixelStructure structure, List<Line2d> actualShape, Domain2d boundingBox)
+        public FrixelReferenceData(PixelStructure pixelStructure, MassingStructure massingStructure)
         {
-            this.Structure = structure;
-            this.ActualShape = actualShape;
-            this.BoundingBox = boundingBox;
+            this.Structure = pixelStructure;
+            this.MassingStructure = massingStructure;
+            this.ActualShape = massingStructure.Outline;
+            this.BoundingBox = massingStructure.BoundingBox;
+            this.ActualXSize = massingStructure.xSpacing;
+            this.ActuveYSize = massingStructure.ySpacing;
         } 
     }
 }

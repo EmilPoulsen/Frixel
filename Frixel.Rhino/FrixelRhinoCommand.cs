@@ -23,6 +23,7 @@ namespace Frixel.Rhinoceros
 
         private double _xSize;
         private double _ySize;
+
         private Curve _lastReffedCurve;
         private Tuple<Point3d, Point3d> _spine;
 
@@ -94,9 +95,6 @@ namespace Frixel.Rhinoceros
 
             // Create a 2d domain bbox 
             Core.Domain2d Boundingbox = new Domain2d(new Core.Domain(corns[0].X, corns[1].X), new Core.Domain(corns[0].Y, corns[3].Y));
-
-            // If its too small fuck off
-            if (_xSize * 2 > xDim | _ySize * 2 > yDim) { return null; }
 
             // Get the dimensions of the massing bbox
             var xNumber = System.Convert.ToInt32(Math.Ceiling(xDim / _xSize));
@@ -285,7 +283,7 @@ namespace Frixel.Rhinoceros
 
 
             // Return the data
-            return new UI.FrixelReferenceData(pixelStruct, massing.Outline, massing.BoundingBox);
+            return new UI.FrixelReferenceData(pixelStruct, massing);
         }
 
         private UI.FrixelReferenceData MainWindow_ReferenceFromClient(double xSize, double ySize)
@@ -395,7 +393,7 @@ namespace Frixel.Rhinoceros
             rhLines.ForEach(l => Rhino.RhinoDoc.ActiveDoc.Objects.Add(l.ToNurbsCurve(),attr));
 
             // Bake analytical curves with their colors
-            if(!pixelStructure.HasAnalysisValues()) { return; }
+            if(!pixelStructure.HasAnalysisValues() | !pixelStructure.HasEdgeColors()) { return; }
             var rhAnalyticalLines = pixelStructure.GetAllLines(true).Select(l =>
                  new Rhino.Geometry.Line(l.Start.ToRhinoPoint(), l.End.ToRhinoPoint())
             ).ToList();
@@ -427,10 +425,27 @@ namespace Frixel.Rhinoceros
             this._window = null;
         }
 
+        /// <summary>
+        /// Fires when the window updates the bay size
+        /// </summary>
+        /// <param name="xSize"></param>
+        /// <param name="ySize"></param>
+        /// <returns></returns>
         private UI.FrixelReferenceData MainWindow_UpdateClient(double xSize, double ySize)
         {
-            this._xSize = xSize;
-            this._ySize = ySize;
+            // Generate an array of points
+            var bb = _lastReffedCurve.GetBoundingBox(true);
+            var corns = bb.GetCorners();
+            var xDim = corns[0].DistanceTo(corns[1]);
+            var yDim = corns[0].DistanceTo(corns[3]);
+
+            // Create a 2d domain bbox 
+            Core.Domain2d Boundingbox = new Domain2d(new Core.Domain(corns[0].X, corns[1].X), new Core.Domain(corns[0].Y, corns[3].Y));
+
+            // Check if dimensions are valid
+            if (!(xSize * 2 > xDim)) { this._xSize = xSize; }
+            if (!(ySize * 2 > yDim)) { this._ySize = ySize; } 
+ 
             return this.Regenerate();
         }
 

@@ -22,5 +22,11 @@ namespace Frixel.Core.Extensions
         {
             return number - to < 0.01;
         }
+
+        public static double RoundTo(this double number, int decPlaces)
+        {
+            double multiplier = Math.Pow(10, decPlaces);
+            return Math.Round(number * decPlaces) / decPlaces;
+        }
     }
 }

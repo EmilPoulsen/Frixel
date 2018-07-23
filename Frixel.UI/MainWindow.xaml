@@ -18,6 +18,18 @@
             <ColumnDefinition Width="165"/>
             <ColumnDefinition Width="152"/>
         </Grid.ColumnDefinitions>
+        <GroupBox x:Name="grp_Results" Header="Results" Margin="10,0,10,10" Grid.Column="1" Background="#FFF9F9F9" Grid.Row="2">
+            <Grid>
+                <StackPanel Margin="3,12,-2,0" VerticalAlignment="Top">
+                    <TextBlock x:Name="tb_DispMin" FontSize="9" Text="Displacement Min:"/>
+                    <TextBlock x:Name="tb_DispMax" FontSize="9" Text="Displacement Max"/>
+                    <TextBlock x:Name="tb_ElementCt" FontSize="9" Text="Elements:"/>
+                    <TextBlock x:Name="tb_ConnCt" FontSize="9" Text="Connections:"/>
+                    <TextBlock x:Name="tb_SuppCt" FontSize="9" Text="Supports:"/>
+                    <TextBlock x:Name="tb_NetLen" FontSize="9" Text="Net Length:"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
         <Canvas x:Name="canv_Main" Background="#FFECECEC" Grid.RowSpan="4" Margin="0,20,0,0" MouseDown="canv_Main_MouseDown"/>
         <Button x:Name="btn_RefGeo" Click="btn_RefGeo_Click" Content="Reference" Grid.Column="1" Margin="10,7,10,60" Background="#FFE4FF9C" FontWeight="Bold" Grid.Row="1" BorderBrush="#FFA8A8A8"/>
         <Slider x:Name="sld_GridX" ValueChanged="sld_GridX_ValueChanged" Grid.Column="1" Margin="54,0,37,26" RenderTransformOrigin="0.379,0.13" Maximum="1" LargeChange="0.25" SmallChange="0.05" Height="18" VerticalAlignment="Bottom" Grid.Row="1"/>
@@ -25,8 +37,15 @@
         <Slider x:Name="sld_GridY" ValueChanged="sld_GridY_ValueChanged" Grid.Column="1" Margin="54,0,37,6" RenderTransformOrigin="0.379,0.13" LargeChange="0.25" Maximum="1" SmallChange="0.05" Height="18" VerticalAlignment="Bottom" Grid.Row="1"/>
         <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,6" TextWrapping="Wrap" Text="Grid Y" FontStyle="Italic" Width="39" Height="16" VerticalAlignment="Bottom" Grid.Row="1"/>
 
-        <GroupBox x:Name="grp_Results" Header="Results" Margin="5,10,10,10" Grid.Column="1" Background="#FFF9F9F9" Grid.Row="2" Grid.RowSpan="2">
-            <ListBox x:Name="lb_Results" Margin="0,10,-2,-1" Background="Transparent" BorderBrush="#00ABADB3"/>
+        <GroupBox x:Name="grp_Display" Header="Mode" Margin="10,0,10,10" Grid.Column="1" Background="#FFF9F9F9" Grid.Row="3">
+            <Grid>
+                <StackPanel Margin="3,12,-2,0" VerticalAlignment="Top">
+                    <RadioButton x:Name="rb_DefaultView" Content="Default" IsChecked="True" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Rb_View_Click"/>
+                    <RadioButton x:Name="rb_AnalyticalView" Content="Analytical" VerticalAlignment="Top" Margin="0,0,41,0" Click="Rb_View_Click"/>
+                </StackPanel>
+            </Grid>
+
+
         </GroupBox>
         <Grid Grid.Column="2" Margin="10,0,10,3" Grid.Row="3">
             <Grid.RowDefinitions>
@@ -44,7 +63,7 @@
             <Button x:Name="btn_BraceAll" Content="BraceAll" Margin="0,0,1,1" Grid.Column="1" Background="#FFFDEDFF" Click="btn_BraceAll_Click"/>
             <Button x:Name="btn_Optimize" Content="Optimize" Margin="0,16,1,6" Grid.RowSpan="2" Background="#FFBDFFC9" Click="btn_Optimize_Click" Grid.Row="1"/>
         </Grid>
-        <TextBlock x:Name="tb_GridSize" TextWrapping="Wrap" Text="gridsize" Margin="5,0,0,3" Height="16" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="82" Grid.Row="3"/>
+        <TextBlock x:Name="tb_GridSize" TextWrapping="Wrap" Margin="5,0,0,3" Height="16" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="82" Grid.Row="3" FontSize="10"/>
         <GroupBox x:Name="grp_Results_Copy" Header="Loading" Margin="10,0" Grid.Column="2" Background="#FFF9F9F9" Grid.Row="1">
             <Grid Grid.Column="1">
                 <Grid.ColumnDefinitions>
@@ -65,7 +84,8 @@
                 <TextBlock Margin="0,10,88,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="9" RenderTransformOrigin="1.062,1.295" Grid.Column="1" Height="12" FontWeight="Bold"/>
                 <Slider x:Name="sld_WindLoad" ValueChanged="sld_WindLoad_ValueChanged" Grid.Column="1" Margin="10,0,10,9" RenderTransformOrigin="0.379,0.13" Maximum="1" LargeChange="0.25" SmallChange="0.05" Height="18" VerticalAlignment="Bottom"/>
                 <TextBlock Margin="5,0,10,30" TextAlignment="Center" TextWrapping="Wrap" Text="Wind Load" FontStyle="Italic" Grid.Column="1" Height="16" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="96"/>
-                <TextBlock x:Name="tb_WindLoad" Margin="19,5,22,0" TextWrapping="Wrap" Text="0" TextAlignment="Center" Grid.Column="1" FontSize="24" HorizontalAlignment="Center" Width="74" Height="36" VerticalAlignment="Top" Foreground="#FF444444"/>
+                <TextBlock x:Name="tb_WindLoad" Margin="17,5,61,0" TextWrapping="Wrap" Text="0" TextAlignment="Right" Grid.Column="1" FontSize="24" HorizontalAlignment="Center" Width="37" Height="36" VerticalAlignment="Top" Foreground="#FF444444"/>
+                <TextBlock x:Name="tb_WindDir" Margin="59,5,36,0" TextWrapping="Wrap" Text="→" TextAlignment="Center" Grid.Column="1" FontSize="24" HorizontalAlignment="Center" Width="20" Height="36" VerticalAlignment="Top" Foreground="#FF444444" MouseDown="tb_WindDir_MouseDown"/>
             </Grid>
         </GroupBox>
         <Rectangle Grid.Column="2" Fill="White" HorizontalAlignment="Left" Height="369" Margin="0,0,0,-57" Grid.RowSpan="3" Stroke="#FFE6E6E6" VerticalAlignment="Top" Width="1" Grid.Row="1"/>

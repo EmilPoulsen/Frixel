@@ -33,15 +33,7 @@ namespace Frixel.Core
         {
             this.Nodes = nodes;
             this.Pixels = pixels;
-            this.DispNodes = nodes.Select(n =>
-            {
-                return new Point2d(n.X, n.Y)
-                {
-                    IsLocked = n.IsLocked,
-                    IsInside = n.IsInside,
-                    IsPixeled = n.IsPixeled,
-                };
-            }).ToList();
+            this.DispNodes = new List<Point2d>();
 
             // Generates edges from pixels
             var allEdges = pixels.SelectMany(p => p.GetEdges());
@@ -58,7 +50,15 @@ namespace Frixel.Core
         /// <returns></returns>
         public bool HasAnalysisValues()
         {
-            return this.AllEdgeColors.Count != 0 && this.DispNodes.Count != 0;
+            return this.DispNodes.Count != 0;
+        }
+        /// <summary>
+        /// Returns true if there is a matching list of edge colors for displaced nodes 
+        /// </summary>
+        /// <returns></returns>
+        public bool HasEdgeColors()
+        {
+            return this.AllEdgeColors.Count != 0 && this.AllEdgeColors.Count == this.DispNodes.Count;
         }
 
         /// <summary>
@@ -112,11 +112,27 @@ namespace Frixel.Core
         /// </summary>
         public void ResetDisp()
         {
-            for (int i = 0; i < this.Nodes.Count; i++)
+            if(this.DispNodes.Count == 0)
             {
-                this.DispNodes[i].X = this.Nodes[i].X;
-                this.DispNodes[i].Y = this.Nodes[i].Y;
+                this.DispNodes = this.Nodes.Select(n =>
+                {
+                    return new Point2d(n.X, n.Y)
+                    {
+                        IsLocked = n.IsLocked,
+                        IsInside = n.IsInside,
+                        IsPixeled = n.IsPixeled,
+                    };
+                }).ToList();
             }
+            else
+            {
+                for (int i = 0; i < this.Nodes.Count; i++)
+                {
+                    this.DispNodes[i].X = this.Nodes[i].X;
+                    this.DispNodes[i].Y = this.Nodes[i].Y;
+                }
+            }
+
         }
 
         /// <summary>
@@ -145,26 +161,30 @@ namespace Frixel.Core
             bool left = location.X < closestNode.X;
 
             // Find the relevant pixel  
-            // Bottom Right
-            if(above && left)
+            try
             {
-                this.Pixels.Where(p => p.BottomRight == closestNodeIndex).First().FlipState();
-            }
-            // Bottom Left
-            else if (above && !left)
-            {
-                this.Pixels.Where(p => p.BottomLeft == closestNodeIndex).First().FlipState();
-            }
-            // Top Left
-            else if (!above && !left)
-            {
-                this.Pixels.Where(p => p.TopLeft == closestNodeIndex).First().FlipState();
-            }
-            // Top right
-            else
-            {
-                this.Pixels.Where(p => p.TopRight == closestNodeIndex).First().FlipState();
-            }
+                // Bottom Right
+                if (above && left)
+                {
+                    this.Pixels.Where(p => p.BottomRight == closestNodeIndex).First().FlipState();
+                }
+                // Bottom Left
+                else if (above && !left)
+                {
+                    this.Pixels.Where(p => p.BottomLeft == closestNodeIndex).First().FlipState();
+                }
+                // Top Left
+                else if (!above && !left)
+                {
+                    this.Pixels.Where(p => p.TopLeft == closestNodeIndex).First().FlipState();
+                }
+                // Top right
+                else
+                {
+                    this.Pixels.Where(p => p.TopRight == closestNodeIndex).First().FlipState();
+                }
+            } catch { return false; }
+
 
             return true;
         }

@@ -182,7 +182,30 @@ namespace Frixel.Core {
         public Dictionary<int, NodeResult> NodeResults;
         public Dictionary<int, ElementResult> ElementResults;
         public Dictionary<int, PixelResult> PixelResults;
-        
+    }
+
+    public class AnalysisSummary
+    {
+        public double MinDisplacement;
+        public double MaxDisplacement;
+        public double NetLength;
+        public int Elements = 0;
+        public int Connections = 0;
+        public int Supports = 0;
+
+        public AnalysisSummary(AnalysisResults results, PixelStructure structure)
+        {
+            foreach (var node in structure.Nodes)
+            {
+                if (node.IsLocked) { Supports++; }
+                if (node.IsPixeled) { Connections++; }
+            }
+            Elements = structure.Edges.Count;
+            NetLength = structure.Edges.Select(e => structure.Nodes[e.Start].DistanceTo(structure.Nodes[e.End])).Sum();
+            IEnumerable<double> displacements = results.NodeResults.Values.Select(n => Math.Sqrt(Math.Pow(n.DispX, 2) + Math.Pow(n.DispY, 2)));
+            MaxDisplacement = displacements.Max();
+            MinDisplacement = displacements.Min();
+        }
     }
 
     public enum PixelState
