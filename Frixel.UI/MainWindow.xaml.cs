@@ -533,7 +533,7 @@ namespace Frixel.UI
                 List<double> edgeMap = new List<double>();
                 _pixelStructure.GetAllEdges().ForEach(e =>
                 {
-                    edgeMap.Add(_dispMap[e.Start] + _dispMap[e.End]);
+                    edgeMap.Add(Math.Abs(_dispMap[e.Start]) + Math.Abs(_dispMap[e.End]));
                 });
                 var startingDomain = new Domain(
                     edgeMap.Min(),
