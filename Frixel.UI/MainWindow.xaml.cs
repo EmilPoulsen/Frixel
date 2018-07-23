@@ -305,9 +305,9 @@ namespace Frixel.UI
         {
             var refData = ReferenceFromClient(_xGridSize, _yGridSize);
             if (refData == null) { return; }
-
+            MainWindow.AnalysisResults = null;
             SetUpdated(refData);
-            this.Redraw();
+            this.ChangeDisplayState(DisplayState.Default, true);
         }
 
         private void sld_GridX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -357,7 +357,6 @@ namespace Frixel.UI
             var update = UpdateClient(_xGridSize, _yGridSize);
             SetUpdated(update);
             this.ChangeDisplayState(DisplayState.Default);
-            Redraw();
         }
 
         private void btn_BraceAll_Click(object sender, RoutedEventArgs e)
@@ -704,9 +703,7 @@ namespace Frixel.UI
                     if (rb_DefaultView.IsChecked != true) { rb_DefaultView.IsChecked = true; }
                     break;
             }
-            // If the state hasn't changed (fluke) early return
-            if (this._displayState == newState) { return; }
-            this._displayState = newState;
+            if (this._displayState != newState) { this._displayState = newState; }
             if (redraw) { Redraw(); }
         }
 
