@@ -17,6 +17,8 @@ using System.Windows.Shapes;
 using Frixel.Core;
 using Frixel.Core.Extensions;
 using Frixel.Core.Geometry;
+using Frixel.Core.Analysis;
+using Frixel.Core.Loading;
 
 namespace Frixel.UI
 {

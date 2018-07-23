@@ -5,6 +5,7 @@ using Frixel.Core.Geometry;
 using System.Collections.Generic;
 using Frixel.Optimizer;
 using System.Diagnostics;
+using Frixel.Core.Analysis;
 
 namespace Frixel.Test {
     [TestClass]
@@ -16,8 +17,7 @@ namespace Frixel.Test {
             
             FrixelAnalyzer analyzer = new FrixelAnalyzer();
 
-            AnalysisResults results = analyzer.Analyze(pixelStructure);
-            
+            AnalysisResults results = analyzer.Analyze(pixelStructure);          
         }
 
         [TestMethod]

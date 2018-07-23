@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using SharpFE;
 using Frixel.Core;
 using GeneticSharp.Domain.Randomizations;
+using Frixel.Core.Analysis;
+using Frixel.Core.Loading;
 
 namespace Frixel.Optimizer {
 

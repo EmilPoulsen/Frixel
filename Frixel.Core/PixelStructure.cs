@@ -1,5 +1,6 @@
 ﻿using Frixel.Core.Display;
 using Frixel.Core.Geometry;
+using Frixel.Core.Loading;
 using System;
 using System.Collections.Generic;
 using System.Linq;

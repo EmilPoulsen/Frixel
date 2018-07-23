@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpFE;
 using SharpFE.Geometry;
+using Frixel.Core.Analysis;
 
 namespace Frixel.Optimizer
 {

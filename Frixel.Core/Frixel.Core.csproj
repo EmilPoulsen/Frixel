@@ -41,12 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnalysisResults.cs" />
     <Compile Include="Display.cs" />
     <Compile Include="Domain.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GeometryExtensions.cs" />
     <Compile Include="Geometry\Line2d.cs" />
     <Compile Include="Geometry\Point2d.cs" />
+    <Compile Include="Load.cs" />
     <Compile Include="MassingStructure.cs" />
     <Compile Include="ModelCreator.cs" />
     <Compile Include="Pixel.cs" />
