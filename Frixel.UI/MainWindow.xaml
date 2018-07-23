@@ -113,9 +113,9 @@
                             <TranslateTransform/>
                         </TransformGroup>
                     </LinearGradientBrush.RelativeTransform>
-                    <GradientStop Color="#FFE4B927" Offset="0"/>
-                    <GradientStop Color="#FF00CB8A" Offset="1"/>
-                    <GradientStop Color="#FFD16E20" Offset="0.491"/>
+                    <GradientStop Color="#FFE4B927" Offset="0.552"/>
+                    <GradientStop Color="#FF00CB8A" Offset="0.257"/>
+                    <GradientStop Color="#FFD16E20" Offset="1"/>
                 </LinearGradientBrush>
             </Grid.Background>
             <TextBlock HorizontalAlignment="Left" Margin="6,2,0,3" TextWrapping="Wrap" Text="Frixel" Width="31" Foreground="White"/>
