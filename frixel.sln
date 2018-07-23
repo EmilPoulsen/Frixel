@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frixel.Rhinoceros", "Frixel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frixel.Test", "Frixel.Test\Frixel.Test.csproj", "{1656F08F-1C13-4E0C-B853-596BF4DFDF2D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{3C991E34-B426-4DBD-902F-3384468C7BCD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frixel.VersionBumper", "Frixel.VersionBumper\Frixel.VersionBumper.csproj", "{FB21CBCB-68A7-43FA-8FFA-8154888320BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,9 +43,16 @@ Global
 		{1656F08F-1C13-4E0C-B853-596BF4DFDF2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1656F08F-1C13-4E0C-B853-596BF4DFDF2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1656F08F-1C13-4E0C-B853-596BF4DFDF2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB21CBCB-68A7-43FA-8FFA-8154888320BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB21CBCB-68A7-43FA-8FFA-8154888320BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB21CBCB-68A7-43FA-8FFA-8154888320BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB21CBCB-68A7-43FA-8FFA-8154888320BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FB21CBCB-68A7-43FA-8FFA-8154888320BD} = {3C991E34-B426-4DBD-902F-3384468C7BCD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7889DD3D-0452-4042-9201-ABE43BE813F3}
