@@ -59,7 +59,7 @@ namespace Frixel.Core
         /// <returns></returns>
         public bool HasEdgeColors()
         {
-            return this.AllEdgeColors.Count != 0 && this.AllEdgeColors.Count == this.DispNodes.Count;
+            return this.AllEdgeColors.Count != 0 && this.AllEdgeColors.Count == this.GetAllEdges().Count;
         }
 
         /// <summary>

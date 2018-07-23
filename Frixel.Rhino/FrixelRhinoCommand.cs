@@ -391,9 +391,10 @@ namespace Frixel.Rhinoceros
             var attr = SetUpAttr("Designed_Structure", System.Drawing.Color.White);
                 
             rhLines.ForEach(l => Rhino.RhinoDoc.ActiveDoc.Objects.Add(l.ToNurbsCurve(),attr));
+            RhinoDoc.ActiveDoc.Views.Redraw();
 
             // Bake analytical curves with their colors
-            if(!pixelStructure.HasAnalysisValues() | !pixelStructure.HasEdgeColors()) { return; }
+            if (!pixelStructure.HasAnalysisValues() | !pixelStructure.HasEdgeColors()) { return; }
             var rhAnalyticalLines = pixelStructure.GetAllLines(true).Select(l =>
                  new Rhino.Geometry.Line(l.Start.ToRhinoPoint(), l.End.ToRhinoPoint())
             ).ToList();
