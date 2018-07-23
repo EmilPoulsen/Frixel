@@ -356,6 +356,7 @@ namespace Frixel.UI
             MainWindow.AnalysisResults = null;
             var update = UpdateClient(_xGridSize, _yGridSize);
             SetUpdated(update);
+            this.ChangeDisplayState(DisplayState.Default);
             Redraw();
         }
 
