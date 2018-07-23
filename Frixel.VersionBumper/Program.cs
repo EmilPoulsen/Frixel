@@ -19,6 +19,10 @@ namespace Frixel.VersionBumper {
             string assem = @"\Properties\AssemblyInfo.cs";
 
             projNames.Add("Frixel.Core");
+            projNames.Add("Frixel.Optimizer");
+            projNames.Add("Frixel.Rhino");
+            projNames.Add("Frixel.Test");
+            projNames.Add("Frixel.UI");
 
             foreach (var projName in projNames) {
                 assemblies.Add(solutionDir + projName + assem);
