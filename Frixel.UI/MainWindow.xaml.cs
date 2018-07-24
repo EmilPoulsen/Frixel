@@ -49,6 +49,10 @@ namespace Frixel.UI
         /// Margin of canvas in pixels
         /// </summary>
         const double CanvasMargin = 60;
+        /// <summary>
+        /// Length of an animation cycle in milliseconds
+        /// </summary>
+        const int AnimationLoopDuration = 2000;
 
         public delegate FrixelReferenceData PixelStructurePass(double xSize, double ySize);
         public static event PixelStructurePass ReferenceFromClient;
@@ -79,6 +83,8 @@ namespace Frixel.UI
         private DisplayState _displayState = DisplayState.Default;
         private Direction _windDirection = Direction.Right;
         private DrawState _drawState = DrawState.DrawBracing;
+        private AnimationState _animationState = AnimationState.Static;
+        
         private bool _isRedrawing = false;
 
         private SolidColorBrush _defaultBtnBgBrush = Brushes.White;
@@ -339,6 +345,7 @@ namespace Frixel.UI
 
         private void sld_GravLoad_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            //if(_animationState == AnimationState.Animating) { return; }
             tb_GravLoad.Text = Math.Round(sld_GravLoad.Value.Map(new Domain(0, 1), new Domain(0, 10))).ToString();
             if (AnalysisResults == null) { return; }
             Redisplace();
@@ -753,6 +760,64 @@ namespace Frixel.UI
             //btn_DrawRect.Foreground = _defaultBtnFgBrush;
             btn_DrawSupports.Foreground = _defaultBtnFgBrush;
         }
+
+        private void AnimateGravityLoadSlider()
+        {
+            // LJ Not efficient to regenerate this storyboard every time
+            double maxValue = sld_GravLoad.Value;
+            Storyboard gravSliderAnimBoard = new Storyboard();
+            TimeSpan duration = new TimeSpan(0, 0, 0, 0, AnimationLoopDuration / 2);
+            gravSliderAnimBoard.Completed += GravSliderAnimBoard_Completed;
+            var gravSliderTo0 = new DoubleAnimation
+            {
+                From = maxValue,
+                To = 0,
+                Duration = new Duration(new TimeSpan(0, 0, 0, 0, AnimationLoopDuration / 2))
+            };
+            gravSliderTo0.BeginTime = new TimeSpan(0, 0, 0);
+            Storyboard.SetTargetName(gravSliderTo0, this.sld_GravLoad.Name);
+            Storyboard.SetTargetProperty(gravSliderTo0, new PropertyPath("Value", 0));
+            gravSliderAnimBoard.Children.Add(gravSliderTo0);
+
+            var gravSliderToMax = new DoubleAnimation
+            {
+                From = 0,
+                To = maxValue,
+                Duration = new Duration(new TimeSpan(0, 0, 0, 0, AnimationLoopDuration / 2))
+            };
+            gravSliderToMax.BeginTime = new TimeSpan(0, 0, 0, 0, AnimationLoopDuration / 2);
+            Storyboard.SetTargetName(gravSliderToMax, this.sld_GravLoad.Name);
+            Storyboard.SetTargetProperty(gravSliderToMax, new PropertyPath("Value", 0));
+            gravSliderAnimBoard.Children.Add(gravSliderToMax);
+
+            gravSliderAnimBoard.Begin(this.sld_GravLoad);
+        }
+
+        private void GravSliderAnimBoard_Completed(object sender, EventArgs e)
+        {
+            if(this._animationState == AnimationState.Animating)
+            {
+                AnimateGravityLoadSlider();
+            }
+        }
+
+        private void btn_PlayDisp_Click(object sender, RoutedEventArgs e)
+        {
+            // Don't animate if the value of the slider is zero
+            if (sld_GravLoad.Value == 0) { return; }
+
+            switch (this._animationState){
+                case AnimationState.Static:
+                    btn_PlayDisp.Background = Brushes.Yellow;
+                    this._animationState = AnimationState.Animating;
+                    AnimateGravityLoadSlider();
+                    break;
+                case AnimationState.Animating:
+                    btn_PlayDisp.Background = Brushes.White;
+                    this._animationState = AnimationState.Static;
+                    break;
+            }
+        }
     }
 
     enum DrawState
@@ -762,5 +827,11 @@ namespace Frixel.UI
         DrawSupports,
         DrawRect,
         DrawPolyline
+    }
+
+    enum AnimationState
+    {
+        Static,
+        Animating
     }
 }
