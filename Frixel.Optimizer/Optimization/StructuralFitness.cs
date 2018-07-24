@@ -38,9 +38,8 @@ namespace Frixel.Optimizer {
                 var pixel = _structure.Pixels[i];
 
                 //// HACK //////
-
-                bool lol = rand.Next(0, 2) == 0;
-                pixswi.Switch = lol;
+                //bool lol = rand.Next(0, 2) == 0;
+                //pixswi.Switch = lol;
                 ///// HACK //////
 
                 if (!pixel.LockedBrace) {
@@ -83,23 +82,30 @@ namespace Frixel.Optimizer {
             }
 
             this.LatestResults = results;
-            double max = double.MinValue;
-
             (chromosome as StructuralChromosome).Results = results;
 
-            foreach (var pair in results.NodeResults) {
-                var res = pair.Value;
 
-                double dist = Math.Sqrt(Math.Pow(res.DispX, 2) + Math.Pow(res.DispY, 2));
+            //double max = double.MinValue;
+            //foreach (var pair in results.NodeResults) {
+            //    var res = pair.Value;
 
-                if (dist > max) {
-                    max = dist;
-                }
+            //    double dist = Math.Sqrt(Math.Pow(res.DispX, 2) + Math.Pow(res.DispY, 2));
+
+            //    if (dist > max) {
+            //        max = dist;
+            //    }
+            //}
+
+            double energy = results.ElasticEnergy;
+            double fitness = 0;
+            if (energy > 0) {
+                fitness = 1 / energy;                
             }
-            this.CurrentFitness = max;
+
+            this.CurrentFitness = fitness;
 
             //double weight = CalcWeight(model);
-            return max;
+            return fitness;
         }
 
         public AnalysisResults LatestResults { get; set; }
