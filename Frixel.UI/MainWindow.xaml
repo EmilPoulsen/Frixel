@@ -95,12 +95,12 @@
         <Button x:Name="btn_DrawSupports" Content="[  ]" HorizontalAlignment="Left" VerticalAlignment="Top" Width="26" Height="24" Background="White" BorderBrush="#FFDEDEDE" Margin="0,19,0,0" Grid.Row="1" Click="btn_ChangeDrawMode_Click"/>
         <Button x:Name="btn_DrawBracing" Content="X" HorizontalAlignment="Left" VerticalAlignment="Top" Width="26" Height="26" Background="Yellow" BorderBrush="#FFDEDEDE" Click="btn_ChangeDrawMode_Click" Margin="0,20,0,0" Grid.RowSpan="2"/>
         <Grid x:Name="grd_FrixelSplash" Grid.RowSpan="4" Background="White" Grid.ColumnSpan="4" Margin="0,0,0,3" Visibility="Hidden" >
-            <Rectangle HorizontalAlignment="Left" Height="216" Margin="204,69,0,0" Stroke="#FF00A2FF" VerticalAlignment="Top" Width="215" Fill="#00F4F4F5" StrokeThickness="2" />
-            <Rectangle HorizontalAlignment="Left" Height="218" Margin="197,75,0,0" Stroke="#FFFFB900" VerticalAlignment="Top" Width="214" Fill="#00C6FF03" StrokeThickness="2"/>
-            <TextBlock HorizontalAlignment="Left" Margin="243,95,0,0" TextWrapping="Wrap" Text="Frixel" VerticalAlignment="Top" FontSize="72" FontFamily="Agency FB" Height="101" Width="147"/>
-            <TextBlock HorizontalAlignment="Left" Margin="214,201,0,0" TextWrapping="Wrap" Text="Emil Poulsen &amp; Leland Jobson" VerticalAlignment="Top" Height="20" Width="186" TextAlignment="Center"/>
-            <TextBlock HorizontalAlignment="Left" Margin="218,233,0,0" TextWrapping="Wrap" Text="Developed at BeyondAEC18" VerticalAlignment="Top" Height="19" Width="176" FontSize="10" TextAlignment="Center"/>
-            <TextBlock HorizontalAlignment="Left" Margin="270,250,0,0" TextWrapping="Wrap" Text="07.21.2018" VerticalAlignment="Top" Height="20" Width="68" FontSize="10" TextAlignment="Center"/>
+            <Rectangle HorizontalAlignment="Center" Height="216" Margin="234,69,230,0" Stroke="#FF969899" VerticalAlignment="Top" Width="214" Fill="#00F4F4F5" StrokeThickness="2" />
+            <Rectangle HorizontalAlignment="Center" Height="218" Margin="230,75,234,0" Stroke="#FFC3C3C3" VerticalAlignment="Top" Width="214" Fill="#0003FF53" StrokeThickness="2"/>
+            <TextBlock HorizontalAlignment="Center" Margin="264,95,267,0" TextWrapping="Wrap" Text="Frixel" VerticalAlignment="Top" FontSize="72" FontFamily="Agency FB" Height="101" Width="147" TextAlignment="Center"/>
+            <TextBlock HorizontalAlignment="Center" Margin="250,201,242,0" TextWrapping="Wrap" Text="Emil Poulsen &amp; Leland Jobson" VerticalAlignment="Top" Height="20" Width="186" TextAlignment="Center"/>
+            <TextBlock HorizontalAlignment="Center" Margin="250,233,252,0" TextWrapping="Wrap" Text="Developed at BeyondAEC18" VerticalAlignment="Top" Height="19" Width="176" FontSize="10" TextAlignment="Center"/>
+            <TextBlock HorizontalAlignment="Center" Margin="307,250,303,0" TextWrapping="Wrap" Text="07.21.2018" VerticalAlignment="Top" Height="20" Width="68" FontSize="10" TextAlignment="Center"/>
         </Grid>
         <Grid Grid.ColumnSpan="4" MouseLeftButtonDown="Grid_MouseLeftButtonDown" Margin="0,0,0,6">
             <Grid.Background>
