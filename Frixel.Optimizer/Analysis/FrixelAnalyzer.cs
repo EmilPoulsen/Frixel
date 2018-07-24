@@ -44,6 +44,8 @@ namespace Frixel.Optimizer
                 });
                 i++;
             }
+            pixResults.ElasticEnergy = CalcElasticEnergy(model, results);
+
             //CalcElementResults(model);
 
             return pixResults;
@@ -59,6 +61,28 @@ namespace Frixel.Optimizer
             return disp;
         }
 
+        public double CalcElasticEnergy(FiniteElementModel model, FiniteElementResults results) {
+            double totalWork = 0;
+
+            foreach (var elem in model.Elements) {
+
+                if (elem is LinearTruss) {
+
+                    var truss = elem as LinearTruss;
+
+                    double dx = CalcDx(truss, results);
+
+                    double E = truss.Material.YoungsModulus;
+                    double A = truss.CrossSection.Area;
+
+                    double work = 0.5 * E * A * Math.Pow(dx, 2);
+                    totalWork += work;
+
+                }
+            }
+            return totalWork;
+        }
+
         public List<ElementResult> CalcElementResults(FiniteElementModel model, FiniteElementResults results) {
             List<ElementResult> output = new List<ElementResult>();
 
@@ -67,32 +91,42 @@ namespace Frixel.Optimizer
 
                 if (elem is LinearTruss) {
                     var truss = elem as LinearTruss;
-                    var startLoc = truss.StartNode.Location;
-                    var endLoc = truss.EndNode.Location;
 
-                    var startDisp = GetDisplacement(truss.StartNode, results);
-                    var endDisp = GetDisplacement(truss.EndNode, results);
-
-                    var dispStartLoc = new CartesianPoint(
-                        truss.StartNode.X + startDisp.X,
-                        truss.StartNode.Y + startDisp.Y,
-                        truss.StartNode.Z + startDisp.Z);
-                    var dispEndLoc = new CartesianPoint(
-                        truss.EndNode.X + endDisp.X,
-                        truss.EndNode.Y + endDisp.Y,
-                        truss.EndNode.Z + endDisp.Z);
-
-                    double initialDist = Distance(startLoc, endLoc);
-                    double deformedDist = Distance(dispStartLoc, dispEndLoc);
-
-                    double dx = deformedDist - initialDist;
-                    var axialForce = truss.Material.YoungsModulus * truss.CrossSection.Area * dx;
+                    double dx = CalcDx(truss, results);
+                    double E = truss.Material.YoungsModulus;
+                    double A = truss.CrossSection.Area;
+                    var axialForce = E * A * dx;
 
                     output.Add(new ElementResult() { AxialForce = axialForce });
                 }
             }
             
             return output;
+        }
+
+        public double CalcDx(LinearTruss truss, FiniteElementResults results) {
+            var startLoc = truss.StartNode.Location;
+            var endLoc = truss.EndNode.Location;
+
+            var startDisp = GetDisplacement(truss.StartNode, results);
+            var endDisp = GetDisplacement(truss.EndNode, results);
+
+            var dispStartLoc = new CartesianPoint(
+                truss.StartNode.X + startDisp.X,
+                truss.StartNode.Y + startDisp.Y,
+                truss.StartNode.Z + startDisp.Z);
+            var dispEndLoc = new CartesianPoint(
+                truss.EndNode.X + endDisp.X,
+                truss.EndNode.Y + endDisp.Y,
+                truss.EndNode.Z + endDisp.Z);
+
+            double initialDist = Distance(startLoc, endLoc);
+            double deformedDist = Distance(dispStartLoc, dispEndLoc);
+
+            double dx = deformedDist - initialDist;
+
+            return dx;
+            
         }
 
         public List<ElementResult> CalculatePixelResult() {

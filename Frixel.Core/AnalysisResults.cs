@@ -18,6 +18,8 @@ namespace Frixel.Core.Analysis
         public Dictionary<int, NodeResult> NodeResults;
         public Dictionary<int, ElementResult> ElementResults;
         public Dictionary<int, PixelResult> PixelResults;
+
+        public double ElasticEnergy { get; set; }
     }
 
     public class AnalysisSummary
