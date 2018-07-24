@@ -68,9 +68,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FrixelAnalyzer.cs" />
+    <Compile Include="Analysis\FrixelAnalyzer.cs" />
+    <Compile Include="Optimization\FrixelEventArgs.cs" />
+    <Compile Include="Optimization\PixSwitch.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FrixelOptimizer.cs" />
+    <Compile Include="Optimization\FrixelOptimizer.cs" />
+    <Compile Include="Optimization\StructuralChromosome.cs" />
+    <Compile Include="Optimization\StructuralFitness.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
