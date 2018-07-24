@@ -20,14 +20,6 @@ using Frixel.Core.Loading;
 namespace Frixel.Optimizer {
 
 
-    public class FrixelEventArgs : EventArgs {
-
-        public AnalysisResults AnalysisResults { get; set; }
-
-        public double Fitness { get; set; }
-
-    }
-
     public class FrixelOptimizer {
 
         public event EventHandler RanIteration;

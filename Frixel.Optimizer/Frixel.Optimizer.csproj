@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FrixelAnalyzer.cs" />
+    <Compile Include="FrixelEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FrixelOptimizer.cs" />
   </ItemGroup>
