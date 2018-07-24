@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Frixel.UI"
         mc:Ignorable="d"
-        Title="Frixel" Height="337.5" Width="613.5" SizeChanged="Window_SizeChanged" ResizeMode="CanResizeWithGrip" x:Name="windowMain" AllowsTransparency="True" WindowStyle="None">
+        Title="Frixel" Height="337.5" Width="678" SizeChanged="Window_SizeChanged" ResizeMode="CanResizeWithGrip" x:Name="windowMain" AllowsTransparency="True" WindowStyle="None">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="26"/>
@@ -14,11 +14,12 @@
             <RowDefinition Height="87*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="26*"/>
+            <ColumnDefinition Width="335*"/>
             <ColumnDefinition Width="165"/>
             <ColumnDefinition Width="152"/>
         </Grid.ColumnDefinitions>
-        <GroupBox x:Name="grp_Results" Header="Results" Margin="10,0,10,10" Grid.Column="1" Background="#FFF9F9F9" Grid.Row="2">
+        <GroupBox x:Name="grp_Results" Header="Results" Margin="10,0,10,10" Grid.Column="2" Background="#FFF9F9F9" Grid.Row="2">
             <Grid>
                 <StackPanel Margin="3,12,-2,0" VerticalAlignment="Top">
                     <TextBlock x:Name="tb_DispMin" FontSize="9" Text="Displacement Min:"/>
@@ -30,14 +31,14 @@
                 </StackPanel>
             </Grid>
         </GroupBox>
-        <Canvas x:Name="canv_Main" Background="#FFECECEC" Grid.RowSpan="4" Margin="0,20,0,0" MouseDown="canv_Main_MouseDown"/>
-        <Button x:Name="btn_RefGeo" Click="btn_RefGeo_Click" Content="Reference" Grid.Column="1" Margin="10,7,10,60" Background="#FFE4FF9C" FontWeight="Bold" Grid.Row="1" BorderBrush="#FFA8A8A8"/>
-        <Slider x:Name="sld_GridX" ValueChanged="sld_GridX_ValueChanged" Grid.Column="1" Margin="54,0,37,26" RenderTransformOrigin="0.379,0.13" Maximum="1" LargeChange="0.25" SmallChange="0.05" Height="18" VerticalAlignment="Bottom" Grid.Row="1"/>
-        <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,28" TextWrapping="Wrap" Text="Grid X" FontStyle="Italic" Width="39" Height="16" VerticalAlignment="Bottom" Grid.Row="1"/>
-        <Slider x:Name="sld_GridY" ValueChanged="sld_GridY_ValueChanged" Grid.Column="1" Margin="54,0,37,6" RenderTransformOrigin="0.379,0.13" LargeChange="0.25" Maximum="1" SmallChange="0.05" Height="18" VerticalAlignment="Bottom" Grid.Row="1"/>
-        <TextBlock Grid.Column="1" HorizontalAlignment="Left" Margin="10,0,0,6" TextWrapping="Wrap" Text="Grid Y" FontStyle="Italic" Width="39" Height="16" VerticalAlignment="Bottom" Grid.Row="1"/>
+        <Canvas x:Name="canv_Main" Background="#FFECECEC" Grid.RowSpan="4" Margin="0,20,0,0" MouseDown="canv_Main_MouseDown" Grid.ColumnSpan="2"/>
+        <Button x:Name="btn_RefGeo" Click="btn_RefGeo_Click" Content="Reference" Grid.Column="2" Margin="10,7,10,60" Background="#FFE4FF9C" FontWeight="Bold" Grid.Row="1" BorderBrush="#FFA8A8A8"/>
+        <Slider x:Name="sld_GridX" ValueChanged="sld_GridX_ValueChanged" Grid.Column="2" Margin="54,0,37,26" RenderTransformOrigin="0.379,0.13" Maximum="1" LargeChange="0.25" SmallChange="0.05" Height="18" VerticalAlignment="Bottom" Grid.Row="1"/>
+        <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="10,0,0,28" TextWrapping="Wrap" Text="Grid X" FontStyle="Italic" Width="39" Height="16" VerticalAlignment="Bottom" Grid.Row="1"/>
+        <Slider x:Name="sld_GridY" ValueChanged="sld_GridY_ValueChanged" Grid.Column="2" Margin="54,0,37,6" RenderTransformOrigin="0.379,0.13" LargeChange="0.25" Maximum="1" SmallChange="0.05" Height="18" VerticalAlignment="Bottom" Grid.Row="1"/>
+        <TextBlock Grid.Column="2" HorizontalAlignment="Left" Margin="10,0,0,6" TextWrapping="Wrap" Text="Grid Y" FontStyle="Italic" Width="39" Height="16" VerticalAlignment="Bottom" Grid.Row="1"/>
 
-        <GroupBox x:Name="grp_Display" Header="Mode" Margin="10,0,10,10" Grid.Column="1" Background="#FFF9F9F9" Grid.Row="3">
+        <GroupBox x:Name="grp_Display" Header="Mode" Margin="10,0,10,10" Grid.Column="2" Background="#FFF9F9F9" Grid.Row="3">
             <Grid>
                 <StackPanel Margin="3,12,-2,0" VerticalAlignment="Top">
                     <RadioButton x:Name="rb_DefaultView" Content="Default" IsChecked="True" HorizontalAlignment="Left" VerticalAlignment="Top" Click="Rb_View_Click"/>
@@ -47,7 +48,7 @@
 
 
         </GroupBox>
-        <Grid Grid.Column="2" Margin="10,0,10,3" Grid.Row="3">
+        <Grid Grid.Column="3" Margin="10,0,10,3" Grid.Row="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="3*"/>
                 <RowDefinition Height="3*"/>
@@ -63,8 +64,8 @@
             <Button x:Name="btn_BraceAll" Content="BraceAll" Margin="0,0,1,1" Grid.Column="1" Background="#FFFDEDFF" Click="btn_BraceAll_Click"/>
             <Button x:Name="btn_Optimize" Content="Optimize" Margin="0,16,1,6" Grid.RowSpan="2" Background="#FFBDFFC9" Click="btn_Optimize_Click" Grid.Row="1"/>
         </Grid>
-        <TextBlock x:Name="tb_GridSize" TextWrapping="Wrap" Margin="5,0,0,3" Height="16" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="82" Grid.Row="3" FontSize="10"/>
-        <GroupBox x:Name="grp_Results_Copy" Header="Loading" Margin="10,0" Grid.Column="2" Background="#FFF9F9F9" Grid.Row="1">
+        <TextBlock x:Name="tb_GridSize" TextWrapping="Wrap" Margin="5,0,0,3" Height="16" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="82" Grid.Row="3" FontSize="10" Grid.ColumnSpan="2"/>
+        <GroupBox x:Name="grp_Results_Copy" Header="Loading" Margin="10,0" Grid.Column="3" Background="#FFF9F9F9" Grid.Row="1">
             <Grid Grid.Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -75,7 +76,7 @@
                 <TextBlock x:Name="tb_GravLoad" Margin="24,5,22,0" TextWrapping="Wrap" Text="0" TextAlignment="Center" FontSize="24" HorizontalAlignment="Center" Width="74" Height="33" VerticalAlignment="Top" Foreground="#FF444444"/>
             </Grid>
         </GroupBox>
-        <GroupBox x:Name="grp_Results_Copy1" Header="Loading" Margin="10,0,10,10" Grid.Column="2" Background="#FFF9F9F9" Grid.Row="2">
+        <GroupBox x:Name="grp_Results_Copy1" Header="Loading" Margin="10,0,10,10" Grid.Column="3" Background="#FFF9F9F9" Grid.Row="2">
             <Grid Grid.Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
@@ -88,21 +89,20 @@
                 <TextBlock x:Name="tb_WindDir" Margin="59,5,36,0" TextWrapping="Wrap" Text="→" TextAlignment="Center" Grid.Column="1" FontSize="24" HorizontalAlignment="Center" Width="20" Height="36" VerticalAlignment="Top" Foreground="#FF444444" MouseDown="tb_WindDir_MouseDown"/>
             </Grid>
         </GroupBox>
-        <Rectangle Grid.Column="2" Fill="White" HorizontalAlignment="Left" Height="369" Margin="0,0,0,-57" Grid.RowSpan="3" Stroke="#FFE6E6E6" VerticalAlignment="Top" Width="1" Grid.Row="1"/>
-        <TextBlock x:Name="tb_gridX" TextWrapping="Wrap" Text="gridsize" Margin="133,0,10,28" Height="16" VerticalAlignment="Bottom" Grid.Column="1" Grid.Row="1"/>
-        <TextBlock x:Name="tb_gridY" TextWrapping="Wrap" Text="gridsize" Margin="133,0,10,7" Height="16" VerticalAlignment="Bottom" Grid.Column="1" Grid.Row="1"/>
-        <Grid x:Name="grd_FrixelSplash" Grid.RowSpan="4" Background="White" Grid.ColumnSpan="3" Margin="0,0,0,3" Visibility="Hidden" >
-            <Rectangle HorizontalAlignment="Left" Height="216" Margin="204,69,0,0" Stroke="#FF00A2FF" VerticalAlignment="Top" Width="215" Fill="#00F4F4F5" StrokeThickness="2" />
-            <Rectangle HorizontalAlignment="Left" Height="218" Margin="197,75,0,0" Stroke="#FFFFB900" VerticalAlignment="Top" Width="214" Fill="#00C6FF03" StrokeThickness="2"/>
-            <TextBlock HorizontalAlignment="Left" Margin="243,95,0,0" TextWrapping="Wrap" Text="Frixel" VerticalAlignment="Top" FontSize="72" FontFamily="Agency FB" Height="101" Width="147"/>
-            <TextBlock HorizontalAlignment="Left" Margin="214,201,0,0" TextWrapping="Wrap" Text="Emil Poulsen &amp; Leland Jobson" VerticalAlignment="Top" Height="20" Width="186" TextAlignment="Center"/>
-            <TextBlock HorizontalAlignment="Left" Margin="218,233,0,0" TextWrapping="Wrap" Text="Developed at BeyondAEC18" VerticalAlignment="Top" Height="19" Width="176" FontSize="10" TextAlignment="Center"/>
-            <TextBlock HorizontalAlignment="Left" Margin="270,250,0,0" TextWrapping="Wrap" Text="07.21.2018" VerticalAlignment="Top" Height="20" Width="68" FontSize="10" TextAlignment="Center"/>
+        <Rectangle Grid.Column="3" Fill="White" HorizontalAlignment="Left" Height="369" Margin="0,0,0,-57" Grid.RowSpan="3" Stroke="#FFE6E6E6" VerticalAlignment="Top" Width="1" Grid.Row="1"/>
+        <TextBlock x:Name="tb_gridX" TextWrapping="Wrap" Text="gridsize" Margin="133,0,10,28" Height="16" VerticalAlignment="Bottom" Grid.Column="2" Grid.Row="1"/>
+        <TextBlock x:Name="tb_gridY" TextWrapping="Wrap" Text="gridsize" Margin="133,0,10,7" Height="16" VerticalAlignment="Bottom" Grid.Column="2" Grid.Row="1"/>
+        <Button x:Name="btn_DrawSupports" Content="[  ]" HorizontalAlignment="Left" VerticalAlignment="Top" Width="26" Height="24" Background="White" BorderBrush="#FFDEDEDE" Margin="0,19,0,0" Grid.Row="1" Click="btn_ChangeDrawMode_Click"/>
+        <Button x:Name="btn_DrawBracing" Content="X" HorizontalAlignment="Left" VerticalAlignment="Top" Width="26" Height="26" Background="Yellow" BorderBrush="#FFDEDEDE" Click="btn_ChangeDrawMode_Click" Margin="0,20,0,0" Grid.RowSpan="2"/>
+        <Grid x:Name="grd_FrixelSplash" Grid.RowSpan="4" Background="White" Grid.ColumnSpan="4" Margin="0,0,0,3" Visibility="Hidden" >
+            <Rectangle HorizontalAlignment="Center" Height="216" Margin="234,69,230,0" Stroke="#FF969899" VerticalAlignment="Top" Width="214" Fill="#00F4F4F5" StrokeThickness="2" />
+            <Rectangle HorizontalAlignment="Center" Height="218" Margin="230,75,234,0" Stroke="#FFC3C3C3" VerticalAlignment="Top" Width="214" Fill="#0003FF53" StrokeThickness="2"/>
+            <TextBlock HorizontalAlignment="Center" Margin="264,95,267,0" TextWrapping="Wrap" Text="Frixel" VerticalAlignment="Top" FontSize="72" FontFamily="Agency FB" Height="101" Width="147" TextAlignment="Center"/>
+            <TextBlock HorizontalAlignment="Center" Margin="250,201,242,0" TextWrapping="Wrap" Text="Emil Poulsen &amp; Leland Jobson" VerticalAlignment="Top" Height="20" Width="186" TextAlignment="Center"/>
+            <TextBlock HorizontalAlignment="Center" Margin="250,233,252,0" TextWrapping="Wrap" Text="Developed at BeyondAEC18" VerticalAlignment="Top" Height="19" Width="176" FontSize="10" TextAlignment="Center"/>
+            <TextBlock HorizontalAlignment="Center" Margin="307,250,303,0" TextWrapping="Wrap" Text="07.21.2018" VerticalAlignment="Top" Height="20" Width="68" FontSize="10" TextAlignment="Center"/>
         </Grid>
-        <Grid x:Name="grd_Message" HorizontalAlignment="Left" Height="47" Margin="182,25,0,0" Grid.Row="2" VerticalAlignment="Top" Width="215" Grid.ColumnSpan="2" Background="#E5FFE801" Visibility="Hidden">
-            <TextBlock Margin="11,11,10,9" TextWrapping="Wrap" Text="Modifying Topology" TextAlignment="Center" FontSize="16" FontWeight="Bold"/>
-        </Grid>
-        <Grid Grid.ColumnSpan="3" MouseLeftButtonDown="Grid_MouseLeftButtonDown" Margin="0,0,0,6">
+        <Grid Grid.ColumnSpan="4" MouseLeftButtonDown="Grid_MouseLeftButtonDown" Margin="0,0,0,6">
             <Grid.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <LinearGradientBrush.RelativeTransform>
@@ -121,6 +121,9 @@
             <TextBlock HorizontalAlignment="Left" Margin="6,2,0,3" TextWrapping="Wrap" Text="Frixel" Width="31" Foreground="White"/>
             <TextBlock x:Name="tb_Close" Margin="0,0,3,5" TextWrapping="Wrap" Text="x" Foreground="White" MouseDown="tb_Close_MouseDown" HorizontalAlignment="Right" Width="9"/>
             <TextBlock x:Name="tb_Generations" TextWrapping="Wrap" Margin="42,4,250,0" Foreground="#99FFFFFF" FontSize="9"/>
+        </Grid>
+        <Grid x:Name="grd_Message" HorizontalAlignment="Left" Height="47" Margin="163,25,0,0" Grid.Row="2" VerticalAlignment="Top" Width="215" Grid.ColumnSpan="2" Background="#E5FFE801" Visibility="Hidden" Grid.Column="1">
+            <TextBlock Margin="11,11,10,9" TextWrapping="Wrap" Text="Modifying Topology" TextAlignment="Center" FontSize="16" FontWeight="Bold"/>
         </Grid>
     </Grid>
 </Window>

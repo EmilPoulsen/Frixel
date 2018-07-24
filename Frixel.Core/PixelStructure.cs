@@ -136,22 +136,46 @@ namespace Frixel.Core
 
         }
 
+        private List<Point2d> GetCurrentlyDisplayedNodes(DisplayState displayState)
+        {
+            if (displayState == DisplayState.Analytical) return this.DispNodes;
+            else return this.Nodes;
+        }
+
         /// <summary>
-        /// Returns true if successful
+        /// Returns true if successful, implying a redraw
+        /// </summary>
+        /// <param name="location"></param>
+        /// <param name="displayState"></param>
+        /// <returns></returns>
+        public bool ChangeSupportAtLocation(Point2d location, DisplayState displayState)
+        {
+            // Get currently displayed nodes
+            List<Point2d> MyNodes = GetCurrentlyDisplayedNodes(displayState);
+
+            // Check if point is within domain
+            if (!location.IsWithinDomain(MyNodes, 2)) { return false; }
+
+            // Find closest node to point
+            var closestNode = location.FindClosest(MyNodes);
+
+            // Flip status of support
+            closestNode.IsLocked = !closestNode.IsLocked;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns true if successful, implying a redraw
         /// </summary>
         /// <returns></returns>
-        public bool ChangeBracingAtLocation(Point2d location, bool useAnalytical)
-        {            
-            // Switch node collection based on analytical view
-            List<Point2d> MyNodes = this.Nodes;
-            if (useAnalytical) { MyNodes = this.DispNodes; }
+        public bool ChangeBracingAtLocation(Point2d location, DisplayState displayState)
+        {
+            // Get currently displayed nodes
+            List<Point2d> MyNodes = GetCurrentlyDisplayedNodes(displayState);
 
-            // Check if location is within the domain of the points
-            if (location.X < MyNodes.Select(p => p.X).Min()
-             | location.Y < MyNodes.Select(p => p.Y).Min()
-             | location.X > MyNodes.Select(p => p.X).Max()
-             | location.Y > MyNodes.Select(p => p.Y).Max()
-             ) { return false; }
+            // Check if point is within domain
+            if (!location.IsWithinDomain(MyNodes)) { return false; }
 
             // Find closest node to point
             var closestNode = location.FindClosest(MyNodes);
@@ -185,7 +209,6 @@ namespace Frixel.Core
                     this.Pixels.Where(p => p.TopRight == closestNodeIndex).First().FlipState();
                 }
             } catch { return false; }
-
 
             return true;
         }

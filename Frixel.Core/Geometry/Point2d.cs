@@ -38,5 +38,16 @@ namespace Frixel.Core.Geometry
         {
             return Math.Sqrt(Math.Pow((this.X - b.X), 2) + Math.Pow((this.Y - b.Y), 2));
         }
+
+        public bool IsWithinDomain(List<Point2d> cloud, int margin = 0)
+        {
+            // Check if location is within the domain of the points
+            if (this.X < cloud.Select(p => p.X).Min() - margin
+             | this.Y < cloud.Select(p => p.Y).Min() - margin
+             | this.X > cloud.Select(p => p.X).Max() + margin
+             | this.Y > cloud.Select(p => p.Y).Max() + margin
+             ) { return false; }
+            return true;
+        }
     }
 }
