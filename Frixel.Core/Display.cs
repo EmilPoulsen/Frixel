@@ -25,4 +25,11 @@ namespace Frixel.Core.Display
             this.R = r;
         }
     }
+
+    public enum DisplayState
+    {
+        Default,
+        Analytical,
+        Annotated
+    }
 }

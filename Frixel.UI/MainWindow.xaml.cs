@@ -19,6 +19,7 @@ using Frixel.Core.Extensions;
 using Frixel.Core.Geometry;
 using Frixel.Core.Analysis;
 using Frixel.Core.Loading;
+using Frixel.Core.Display;
 
 namespace Frixel.UI
 {
@@ -60,8 +61,6 @@ namespace Frixel.UI
 
         private double _xGridSize;
         private double _yGridSize;
-        private bool _isRunning;
-        private bool _isRedrawing;
         private Tuple<Domain, Domain> _sliderMappingDomains;
         private Optimizer.FrixelOptimizer _optimizer;
 
@@ -71,14 +70,19 @@ namespace Frixel.UI
 
         public static AnalysisResults AnalysisResults;
         private AnalysisSummary _analysisSummary;
-        private double _windLoad;
         private List<double> _dispMap = new List<double>();
 
         private BackgroundWorker _bw = new BackgroundWorker();
         private bool _bwComplete = true;
         private int _completeGens = 0;
+
         private DisplayState _displayState = DisplayState.Default;
         private Direction _windDirection = Direction.Right;
+        private DrawState _drawState = DrawState.DrawBracing;
+        private bool _isRedrawing = false;
+
+        private SolidColorBrush _defaultBtnBgBrush = Brushes.White;
+        private SolidColorBrush _defaultBtnFgBrush = Brushes.Black;
 
         #region CTOR
 
@@ -88,10 +92,8 @@ namespace Frixel.UI
             WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
             _pixelStructure = pixelStructure;
             _sliderMappingDomains = new Tuple<Domain, Domain>(new Domain(0, 1), new Domain(SliderMin, SliderMax));
-            _isRunning = false;
             _xGridSize = GridSize(sld_GridX.Value);
             _yGridSize = GridSize(sld_GridY.Value);
-            _isRedrawing = false;
             DrawGridSize();
             Redraw();
             Subscribe();
@@ -105,10 +107,8 @@ namespace Frixel.UI
             this.grd_FrixelSplash.Visibility = Visibility.Visible;
             this.grd_FrixelSplash.Opacity = 1;
             _sliderMappingDomains = new Tuple<Domain, Domain>(new Domain(0, 1), new Domain(SliderMin, SliderMax));
-            _isRunning = false;
             _xGridSize = GridSize(sld_GridX.Value);
             _yGridSize = GridSize(sld_GridY.Value);
-            _isRedrawing = false;
             DrawGridSize();
             Subscribe();
         }
@@ -407,22 +407,40 @@ namespace Frixel.UI
 
             // Get the pixel space coordinates of the click
             var location = ScreenSpaceToPixelSpace(e.GetPosition(canv_Main));
+
+            // Get a bool indicating if we should use the analytical model
+
+            switch (this._drawState)
+            {
+                case DrawState.DrawBracing:
+                    if (!this._pixelStructure.ChangeBracingAtLocation(location, this._displayState)) return;
+                    break;
+                case DrawState.DrawSupports:
+                    if (!this._pixelStructure.ChangeSupportAtLocation(location, this._displayState)) return;
+                    break;
+                case DrawState.DrawPolyline:
+                    // Redraw the massing
+                    break;
+                case DrawState.DrawRect:
+                    // Redraw the massing
+                    break;
+            }
+
             switch (this._displayState)
             {
                 case DisplayState.Analytical:
                     {
-                        if (!this._pixelStructure.ChangeBracingAtLocation(location, true)) return;
                         AnalyzeAndRedraw();
                         break;
                     }
                 case DisplayState.Default:
                     {
-                        if (!this._pixelStructure.ChangeBracingAtLocation(location, false)) return;
+                        Redraw();
                         break;
                     }
             }
             // If there hasn't been an early return, then there is a change to be rendered
-            Redraw();
+
         }
 
         private void tb_WindDir_MouseDown(object sender, MouseButtonEventArgs e)
@@ -446,6 +464,22 @@ namespace Frixel.UI
             if ((bool)this.rb_AnalyticalView.IsChecked) {
                 ChangeDisplayState(DisplayState.Analytical, true);
                 if(this._pixelStructure != null) { AnalyzeAndRedraw(); }
+            }
+        }
+
+        private void btn_ChangeDrawMode_Click(object sender, RoutedEventArgs e)
+        {
+            var fe = sender as FrameworkElement;
+            switch (fe.Name)
+            {
+                case "btn_DrawBracing":
+                    ChangeDrawState(DrawState.DrawBracing);
+                    btn_DrawBracing.Background = Brushes.Yellow;
+                    break;
+                case "btn_DrawSupports":
+                    ChangeDrawState(DrawState.DrawSupports);
+                    btn_DrawSupports.Background = Brushes.Yellow;
+                    break;
             }
         }
 
@@ -619,11 +653,12 @@ namespace Frixel.UI
             // Update state
             this.ChangeDisplayState(DisplayState.Analytical);
 
-            // Set stuff
+            // Set Gravity Load
             _pixelStructure.GravityLoad.Activated = true;
             _pixelStructure.GravityLoad.Amplification = 5000;
 
-            if (this.sld_WindLoad.Value != null)
+            // Set Wind Load
+            if (this.sld_WindLoad.Value != 0)
             {
                 _pixelStructure.WindLoad.Activated = true;
                 double windDir = (_windDirection == Direction.Left ? -1 : 1);
@@ -641,9 +676,8 @@ namespace Frixel.UI
             }
             catch (Exception asd)
             {
-                // Show warning message
+                // Show warning message: Topology Modified
                 ShowWarningMessage();
-
                 try
                 {
                     BraceAll();
@@ -658,11 +692,6 @@ namespace Frixel.UI
                     MainWindow.AnalysisResults = null;
                 }
                 HideWarningMessage();
-
-                // LJ PRINT ANALYTICAL VALUES 
-                //if (MainWindow.AnalysisResults == null) { return; }
-                //lb_Results.Items.Clear();
-                //MainWindow.AnalysisResults.NodeResults.Select(r => r.Value.DispX.ToString() + "," + r.Value.DispY.ToString()).ToList().ForEach(r => lb_Results.Items.Add(r));
             }
         }
 
@@ -712,13 +741,26 @@ namespace Frixel.UI
             // LJ TODO
         }
 
-
+        private void ChangeDrawState(DrawState newState)
+        {
+            this._drawState = newState;
+            btn_DrawBracing.Background = _defaultBtnBgBrush;
+            //btn_DrawPolyline.Background = _defaultBtnBgBrush;
+            //btn_DrawRect.Background = _defaultBtnBgBrush;
+            btn_DrawSupports.Background = _defaultBtnBgBrush;
+            btn_DrawBracing.Foreground = _defaultBtnFgBrush;
+            //btn_DrawPolyline.Foreground = _defaultBtnFgBrush;
+            //btn_DrawRect.Foreground = _defaultBtnFgBrush;
+            btn_DrawSupports.Foreground = _defaultBtnFgBrush;
+        }
     }
 
-    enum DisplayState
+    enum DrawState
     {
         Default,
-        Analytical,
-        Annotated
+        DrawBracing,
+        DrawSupports,
+        DrawRect,
+        DrawPolyline
     }
 }
