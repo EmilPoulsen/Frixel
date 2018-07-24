@@ -11,6 +11,5 @@ namespace Frixel.Optimizer {
         public AnalysisResults AnalysisResults { get; set; }
 
         public double Fitness { get; set; }
-
     }
 }
