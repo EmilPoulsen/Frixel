@@ -36,42 +36,70 @@ namespace Frixel.Optimizer
             int i = 0;
             foreach (var node in model.Nodes) {
 
-                DisplacementVector disp = null;
-                if (results.DisplacementVectorExists(node)) {
-                    disp = results.GetDisplacement(node);
-                }
-                else {
-                    disp = new DisplacementVector(node, 0, 0);
-                }
-                
+                DisplacementVector disp = GetDisplacement(node, results);
+
                 pixResults.NodeResults.Add(i, new NodeResult() {
                     DispX = disp.X,
                     DispY = disp.Z
                 });
                 i++;
             }
+            //CalcElementResults(model);
 
             return pixResults;
+        }
+
+        public DisplacementVector GetDisplacement(IFiniteElementNode node, FiniteElementResults results) {
+            DisplacementVector disp = null;
+            if (results.DisplacementVectorExists(node)) {
+                disp = results.GetDisplacement(node);
+            } else {
+                disp = new DisplacementVector(node, 0, 0);
+            }
+            return disp;
+        }
+
+        public List<ElementResult> CalcElementResults(FiniteElementModel model, FiniteElementResults results) {
+            List<ElementResult> output = new List<ElementResult>();
+
+            //1. Calculate for frames
             foreach (var elem in model.Elements) {
 
-                if(elem is LinearTruss) {
+                if (elem is LinearTruss) {
                     var truss = elem as LinearTruss;
                     var startLoc = truss.StartNode.Location;
                     var endLoc = truss.EndNode.Location;
 
+                    var startDisp = GetDisplacement(truss.StartNode, results);
+                    var endDisp = GetDisplacement(truss.EndNode, results);
+
+                    var dispStartLoc = new CartesianPoint(
+                        truss.StartNode.X + startDisp.X,
+                        truss.StartNode.Y + startDisp.Y,
+                        truss.StartNode.Z + startDisp.Z);
+                    var dispEndLoc = new CartesianPoint(
+                        truss.EndNode.X + endDisp.X,
+                        truss.EndNode.Y + endDisp.Y,
+                        truss.EndNode.Z + endDisp.Z);
+
                     double initialDist = Distance(startLoc, endLoc);
+                    double deformedDist = Distance(dispStartLoc, dispEndLoc);
 
+                    double dx = deformedDist - initialDist;
+                    var axialForce = truss.Material.YoungsModulus * truss.CrossSection.Area * dx;
 
-
+                    output.Add(new ElementResult() { AxialForce = axialForce });
                 }
-
-                
-
-
             }
-
             
+            return output;
         }
+
+        public List<ElementResult> CalculatePixelResult() {
+            //2. Calculate for bracings
+            return null;
+        }
+
 
         public double Distance(CartesianPoint p1, CartesianPoint p2) {
             double lengthX = p2.X - p1.X;
