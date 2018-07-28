@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Frixel.Core;
 using Frixel.Core.Extensions;
 using Frixel.Core.Geometry;
 using M = System.Windows.Media;
@@ -50,6 +51,39 @@ namespace Frixel.UI
         public static Point2d ToPoint2d(this System.Windows.Point point)
         {
             return new Point2d(point.X, point.Y);
+        }
+
+        public static System.Windows.Shapes.Polyline ToCanvasArrow(this Line2d line, double arrowheadSize, bool filled = false)
+        {
+            // Point Container
+            var arrow = new System.Windows.Shapes.Polyline();
+            arrow.Points = new M.PointCollection();
+            // Shaft
+            var A = line.Start.ToWindowsPoint();
+            var B = line.End.ToWindowsPoint();
+            // Head
+            Line2d arrow1 = line.ScaleToLocal(Location.End, arrowheadSize, true)
+                                .RotateLocal(Location.End, 45, false);
+            Line2d arrow2 = arrow1.RotateLocal(Location.End, -90, true);
+            var C = arrow1.Start.ToWindowsPoint();
+            var D = arrow2.Start.ToWindowsPoint();
+
+            arrow.Points.Add(A);
+            arrow.Points.Add(B);
+            arrow.Points.Add(C);
+            arrow.Points.Add(B);
+            arrow.Points.Add(D);
+
+            return arrow;
+        }
+
+        public static System.Windows.Point ToWindowsPoint(this Point2d point)
+        {
+            return new System.Windows.Point()
+            {
+                X = point.X,
+                Y = point.Y
+            };
         }
     }
 }

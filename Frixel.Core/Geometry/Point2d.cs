@@ -9,6 +9,8 @@ namespace Frixel.Core.Geometry
 {
     public class Point2d
     {
+        public static Point2d Origin = new Point2d(0, 0);
+
         public bool IsLocked;
         public bool IsInside;
         public bool IsPixeled = false;
@@ -48,6 +50,22 @@ namespace Frixel.Core.Geometry
              | this.Y > cloud.Select(p => p.Y).Max() + margin
              ) { return false; }
             return true;
+        }
+
+        public Point2d Copy()
+        {
+            return new Point2d(this.X, this.Y);
+        }
+
+        public Point2d Move(Line2d translation, bool copy = false)
+        {
+            Point2d pointToMove;
+            if (copy) { pointToMove = this.Copy(); } else { pointToMove = this; }
+
+            pointToMove.X += (translation.End.X - translation.Start.X);
+            pointToMove.Y += (translation.End.Y - translation.Start.Y);
+
+            return pointToMove;
         }
     }
 }

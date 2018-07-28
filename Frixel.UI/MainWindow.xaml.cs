@@ -567,7 +567,7 @@ namespace Frixel.UI
             {
                 return l.Map(pxlSDomain, canvasDomain).ToCanvasLine(Brushes.Gray);
             }).ToList();
-
+            List<Polyline> displacementVectors = new List<Polyline>();
             if (renderDisplacement)
             {
                 // Add analysis colors
@@ -599,6 +599,9 @@ namespace Frixel.UI
 
                     i++;
                 });
+
+                // Render Displacement Vectors
+                if (_pixelStructure.DispVecs != null) displacementVectors.AddRange(_pixelStructure.DispVecs.Select(v => v.ToCanvasArrow(5)));
             }
 
             List<Line> actualMassingLInes = _actualOutline.Select(l =>

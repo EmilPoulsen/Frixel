@@ -11,8 +11,33 @@ namespace Frixel.Core
 {
     public class PixelStructure
     {
-        public List<Point2d> Nodes;
-        public List<Point2d> DispNodes;
+        private List<Point2d> _nodes;
+        private List<Point2d> _dispNodes;
+
+        public List<Point2d> Nodes
+        {
+            get
+            {
+                return this._nodes;
+            }
+            set
+            {
+                this._nodes = value;
+            }
+        }
+        public List<Point2d> DispNodes
+        {
+            get
+            {
+                return this._dispNodes; 
+            }
+            set
+            {
+                this._dispNodes = value;
+                this.DispVecs = GenerateDisplacementVectors();
+            }
+        }
+        public List<Line2d> DispVecs;
         public List<Edge> Edges;
         public List<Pixel> Pixels;
         public WindLoad WindLoad;
@@ -23,6 +48,7 @@ namespace Frixel.Core
         {
             this.Nodes = new List<Point2d>();
             this.DispNodes = new List<Point2d>();
+            this.DispVecs = new List<Line2d>();
             this.Edges = new List<Edge>();
             this.AllEdgeColors = new List<Color>();
             this.Pixels = new List<Pixel>();
@@ -211,6 +237,20 @@ namespace Frixel.Core
             } catch { return false; }
 
             return true;
+        }
+        /// <summary>
+        /// Generates a vector representing the direction of displacement
+        /// </summary>
+        /// <returns></returns>
+        public List<Line2d> GenerateDisplacementVectors()
+        {
+            if (this.DispNodes.Count != this.Nodes.Count) return null;
+            List<Line2d> DisplacementVectors = new List<Line2d>();
+            for(int i = 0; i<Nodes.Count; i++)
+            {
+                DisplacementVectors.Add(new Line2d(Nodes[i], DispNodes[i]).ScaleToLocal(Location.Start,1,true));
+            }
+            return DisplacementVectors;
         }
     }
 }
