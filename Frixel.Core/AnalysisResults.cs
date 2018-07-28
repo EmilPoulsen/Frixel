@@ -53,7 +53,7 @@ namespace Frixel.Core.Analysis
 
     public class ElementResult
     {
-        double AxialForce { get; set; }
+        public double AxialForce { get; set; }
     }
 
     public class PixelResult
